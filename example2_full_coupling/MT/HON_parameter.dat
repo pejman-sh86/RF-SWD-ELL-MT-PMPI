@@ -1,0 +1,81 @@
+0              !! IMAP:       Predict data for MAP file and exit.
+2              !! ICOV:       Selects likelihood function (0=implicit, 1=, 2=Use Cdi.dat)
+0              !! IMAGSCALE   //
+0              !! ENOS:       Even numbered order statistic (avoids thin layers)
+1              !! IPOIPR:     Poisson prior on k
+0              !! IAR         Include autoregressive error model for correlated errors
+0              !! I_VARPAR    Invert with variable layer complexity
+0              !! IBD_SINGLE  Include BD for single parameters onto nodes
+0            !! I_RV        1-> Invert Radial & Vertical; -1-> invert RF
+0              !! I_T         Invert Transverse seismogram component as well
+0            !! I_SWD       Invert surface wave dispersion data (can do joint of both RV+SW)
+0             !! I_ELL       Invert ellipticity data 
+1              !! I_MT        Invert MT data
+1              !! I_ZMT       Invert MT complex impedance tensor
+1              !! I_VREF      Invert for perturbations around reference model
+1             !! I_VPVS      Sample VpVs ratio (instead of Vp)
+0             !! ISMPPRIOR   Sample the prior dist (turns off data)
+0              !! ISETSEED    Fix random number seed to reproduce exact inversion
+1              !! IEXCHANGE   Include parallel tempering exchange moves
+0              !! IDIP        Allow layers to dip (makes inversion significantly slower)
+50           !! NDAT_SWD    No. data in SWD curve
+1              !! NMODE       No. SWD modes
+30           !! NDAT_ELL    No. data in ELL curve
+1              !! NMODE_ELL   No. ELL modes
+22            !! NDAT_MT     NO. MT data
+300            !! NTIME       No. time samples
+20             !! NSRC        No. time samples in source-time function
+2              !! NLMN        Min number of layers
+30             !! NLMX        Max number of layers
+1              !! ICHAINTHIN  Chain thinning interval
+1e2            !! NKEEP       No. models to keep before writing
+6             !! NPTCHAINS1  No. chains at T=1
+1.15             !! dTlog       Temperature increment
+3.0           !! lambda      Parameter for Poisson prior on k
+250.0         !! hmx         Max. partition depth in km
+1.0            !! hmin        Min. layer thickness (must be small enough to not violate detailed balance)in km
+0.1            !! armxH       Max. AR prediction size
+0.1            !! armxV       Max. AR prediction size
+0.1            !! armxSWD     Max. AR prediction size
+0.1            !! armxELL     Max. AR prediction size
+1000           !! TCHCKPT     Checkpointing interval in s
+2.0            !! shift       time series shift for raysum
+1.25            !! width       time series width for raysum (determined in process.m script) or gaussian filter "a" parameter for water-level deconv and ITD
+1.e-8         !! wl          Water level for ray3d 
+0.1            !! sampling_dt time series sampling rate raysum
+1.             !! dVs         maximum shear velocity perturbation from background
+0.3           !! dVpVs       maximum VpVs perturbation from background
+-5.             !!log10sigmamin   minimum ///
+0.0             !! lo10gsigmamax   maximun ///
+1.0e-3 1.0e-3 1.0e-3 1.0e-5     !! sdmn        data (residual) error standard deviation prior lower bound (for RVT comps., SWD, ELL, and  MT)
+1.0e-1 1.0e-1 1.0e-1 1.0e-3         !! sdmx        data (residual) error standard deviation prior upper bound (for RVT comps., SWD, ELL, and MT)
+1              !! iraysum     1 = running raysum, 0 = running ray3d
+2              !! mults
+2              !! directs
+0              !!IDECON       1 = ITD, 0 = water level
+0.01           !! tol percentage for ITD
+400            !! maxbumps for ITD
+400            !! MAXG for ITD
+0.71           !! normalization factor for ITD
+0             !! ISD_RV      1 = hierarchical sd 0 = fixed covariance matrix
+0              !! ISD_SWD     1 = hierarchical sd 0 = fixed covariance matrix
+0              !! ISD_ELL     1 = hierarchical sd 0 = fixed covariance matrix
+0              !! ISD_MT      1 = hierarchical sd 0 = fixed covariance matrix
+1              !! ITAPER      1 = taper pred data
+2              !! ICOV_SWD
+1              !! ICOV_ELL
+0              !! ICOV_MT 
+0              !! ELL_verbose
+1.e-5         !! ELL_prec
+1              !! I_ABS_ELL   
+0              !! I_LOG10_ELL
+0              !! I_SAMPLING_TYPE_ELL     !! 0:regular sampling in log-frequency
+0              !! I_SET_STEP_ELL
+1.5            !! STEP_SIZE_ELL
+0              !! I_SET_COUNT_ELL
+145            !! COUNT_ELL  
+1              !! I_SET_RANGE_ELL         !! 1: does the interpolation
+0
+401
+1 
+0	       !! IGRP        1 = Group velocity SWD, 0 = Phase velocity SWD
