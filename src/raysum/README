@@ -1,0 +1,2 @@
+To include PmP multiples for direct seismogram inversion (DSI):
+cp phaselist.f_with_PmP phaselist.f

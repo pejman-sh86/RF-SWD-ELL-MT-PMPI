@@ -1,0 +1,9 @@
+PASH= $(NVCOMPILERS)/Linux_x86_64/22.5/compilers/lib #PATH TO SHARED LIBRARIES
+#FC      = mpif90 -C -L$(PASH) -llapack -lblas -fast -O4 -fastsse
+#FCSERIAL= pgfortran -C -L$(PASH) -llapack -lblas -fast -O4 -fastsse
+#FCSWD = pgfortran -C -fast -O4 -fastsse
+#FCRS = pgfortran -C -fast -O4 -fastsse
+FC      = mpifort -C -L$(PASH) -llapack -lblas
+FCSERIAL= mpifort -C -L$(PASH) -llapack -lblas
+FCSWD = mpifort -C
+FCRS = mpifort -C

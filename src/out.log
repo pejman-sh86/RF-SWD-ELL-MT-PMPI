@@ -1,0 +1,349 @@
+(cd ./raysum/;make;)
+make[1]: Entering directory '/data/pejman/RF_SWD_HV_MT_joint/raysum'
+mpifort -C -c eigenvec.f
+mpifort -C -c matrixops.f
+mpifort -C -c eispack-cg.f
+mpifort -C -c raysum.f
+mpifort -C -c readwrite.f
+mpifort -C -c phaselist.f
+mpifort -C -c buildmodel.f
+mpifort -C -c trace.f
+mpifort -C -c misfit.f
+mpifort -C -c recipes00.f
+mpifort -C -c itd.f
+ar urv libraysum.a  eigenvec.o matrixops.o eispack-cg.o raysum.o readwrite.o phaselist.o buildmodel.o trace.o misfit.o recipes00.o itd.o
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: creating libraysum.a
+a - eigenvec.o
+a - matrixops.o
+a - eispack-cg.o
+a - raysum.o
+a - readwrite.o
+a - phaselist.o
+a - buildmodel.o
+a - trace.o
+a - misfit.o
+a - recipes00.o
+a - itd.o
+cp *.a ../obj/
+make[1]: Leaving directory '/data/pejman/RF_SWD_HV_MT_joint/raysum'
+/bin/ln -sf ./raysum/*.mod .
+(cd ./swd/;make;)
+make[1]: Entering directory '/data/pejman/RF_SWD_HV_MT_joint/swd'
+mpifort -C -c dispersion.f90
+mpifort -C -c lovmrx.f
+mpifort -C -c raymrx.f
+mpifort -C -c lovdsp.f
+mpifort -C -c raydsp.f
+mpifort -C -c four1.f
+ar urv libswd.a  dispersion.o lovmrx.o raymrx.o lovdsp.o raydsp.o four1.o
+ar: `u' modifier ignored since `D' is the default (see `U')
+ar: creating libswd.a
+a - dispersion.o
+a - lovmrx.o
+a - raymrx.o
+a - lovdsp.o
+a - raydsp.o
+a - four1.o
+cp *.a ../obj/
+make[1]: Leaving directory '/data/pejman/RF_SWD_HV_MT_joint/swd'
+/bin/ln -sf ./swd/*.mod .
+(cd ./gpell/;make;)
+make[1]: Entering directory '/data/pejman/RF_SWD_HV_MT_joint/gpell'
+nvc++ -O2 -fPIC -Wall -Wextra -dM -E -o moc_predefs.h /opt/Qt/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp
+#define __SIGNED_CHARS__ 1
+#define __PRAGMA_REDEFINE_EXTNAME 1
+#define __STDC__ 1
+#define __STDC_HOSTED__ 1
+#define __cplusplus 201402L
+#define _WCHAR_T 1
+#define __CHAR16_T_AND_CHAR32_T 1
+#define _BOOL 1
+#define __ARRAY_OPERATORS 1
+#define __EXCEPTIONS 1
+#define __RTTI 1
+#define __PLACEMENT_DELETE 1
+#define __EDG_RUNTIME_USES_NAMESPACES 1
+#define __EDG_IA64_ABI 1
+#define __cpp_initializer_lists 200806L
+#define __cpp_sized_deallocation 201309L
+#define __cpp_unicode_characters 200704L
+#define __cpp_aggregate_nsdmi 201304L
+#define __cpp_alias_templates 200704L
+#define __cpp_attributes 200809L
+#define __cpp_binary_literals 201304
+#define __cpp_decltype 200707L
+#define __cpp_decltype_auto 201304L
+#define __cpp_delegating_constructors 200604L
+#define __cpp_exceptions 199711L
+#define __cpp_lambdas 200907L
+#define __cpp_nsdmi 200809L
+#define __cpp_raw_strings 200710L
+#define __cpp_ref_qualifiers 200710L
+#define __cpp_return_type_deduction 201304L
+#define __cpp_rtti 199711L
+#define __cpp_rvalue_references 200610L
+#define __cpp_threadsafe_static_init 200806L
+#define __cpp_unicode_literals 200710L
+#define __cpp_user_defined_literals 200809L
+#define __cpp_variable_templates 201304L
+#define __cpp_variadic_templates 200704L
+#define __cpp_constexpr 201304L
+#define __cpp_range_based_for 200907L
+#define __cpp_static_assert 200410
+#define __cpp_init_captures 201803L
+#define __cpp_generic_lambdas 201304L
+#define __EDG_TYPE_TRAITS_ENABLED 1
+#define __VARIADIC_TEMPLATES 1
+#define __STDCPP_THREADS__ 1
+#define __EDG_CONSTEXPR_ENABLED__ 1
+#define __EDG__ 1
+#define __EDG_VERSION__ 602
+#define __EDG_SIZE_TYPE__ unsigned long
+#define __EDG_PTRDIFF_TYPE__ long
+#define __PGIC__ 21
+#define __PGIC_MINOR__ 5
+#define __PGIC_PATCHLEVEL__ 0
+#define __NVCOMPILER_MAJOR__ 21
+#define __NVCOMPILER_MINOR__ 5
+#define __NVCOMPILER_PATCHLEVEL__ 0
+#define __PGI_CLANG_SSE_INTRINSICS_VERSION__ 60000
+#define __NVCOMPILER_CLANG_SSE_INTRINSICS_VERSION__ 60000
+#define __GNUG__ 9
+#define __GXX_RTTI 1
+#define __GNUC_STDC_INLINE__ 1
+#define __GNUC__ 9
+#define __GNUC_MINOR__ 3
+#define __GNUC_PATCHLEVEL__ 0
+#define __VERSION__ "EDG g++ 9.3 mode"
+#define _GNU_SOURCE 1
+#define __CHAR_BIT__ 8
+#define __SCHAR_MAX__ 127
+#define __SHRT_MAX__ 32767
+#define __INT_MAX__ 2147483647
+#define __LONG_MAX__ 9223372036854775807L
+#define __INTMAX_MAX__ 9223372036854775807L
+#define __LONG_LONG_MAX__ 9223372036854775807LL
+#define __SIZEOF_SHORT__ 2
+#define __SIZEOF_INT__ 4
+#define __SIZEOF_LONG__ 8
+#define __SIZEOF_LONG_LONG__ 8
+#define __SIZEOF_FLOAT__ 4
+#define __SIZEOF_DOUBLE__ 8
+#define __SIZEOF_LONG_DOUBLE__ 16
+#define __SIZEOF_WCHAR_T__ 4
+#define __SIZEOF_POINTER__ 8
+#define __SIZEOF_SIZE_T__ 8
+#define __SIZEOF_PTRDIFF_T__ 8
+#define __SIZEOF_WINT_T__ 4
+#define __FLT_RADIX__ 2
+#define __FLT_EVAL_METHOD__ 0
+#define __FLT_MANT_DIG__ 24
+#define __FLT_DIG__ 6
+#define __FLT_MIN_EXP__ (-125)
+#define __FLT_MIN_10_EXP__ (-37)
+#define __FLT_MAX_EXP__ 128
+#define __FLT_MAX_10_EXP__ 38
+#define __FLT_MAX__ 3.40282347e+38F
+#define __FLT_EPSILON__ 1.19209290e-7F
+#define __FLT_MIN__ 1.17549435e-38F
+#define __FLT_DENORM_MIN__ 1.40129846e-45F
+#define __FLT_HAS_INFINITY__ 1
+#define __FLT_HAS_QUIET_NAN__ 1
+#define __DBL_MANT_DIG__ 53
+#define __DBL_DIG__ 15
+#define __DBL_MIN_EXP__ (-1021)
+#define __DBL_MIN_10_EXP__ (-307)
+#define __DBL_MAX_EXP__ 1024
+#define __DBL_MAX_10_EXP__ 308
+#define __DBL_MAX__ 1.7976931348623157e+308
+#define __DBL_EPSILON__ 2.2204460492503131e-16
+#define __DBL_MIN__ 2.2250738585072014e-308
+#define __DBL_DENORM_MIN__ 4.9406564584124654e-324
+#define __DBL_HAS_INFINITY__ 1
+#define __DBL_HAS_QUIET_NAN__ 1
+#define __DECIMAL_DIG__ 21
+#define __LDBL_MANT_DIG__ 64
+#define __LDBL_DIG__ 18
+#define __LDBL_MIN_EXP__ (-16381)
+#define __LDBL_MIN_10_EXP__ (-4931)
+#define __LDBL_MAX_EXP__ 16384
+#define __LDBL_MAX_10_EXP__ 4932
+#define __LDBL_MAX__ 1.18973149535723176502e+4932L
+#define __LDBL_EPSILON__ 1.08420217248550443401e-19L
+#define __LDBL_MIN__ 3.36210314311209350626e-4932L
+#define __LDBL_DENORM_MIN__ 3.64519953188247460253e-4951L
+#define __LDBL_HAS_INFINITY__ 1
+#define __LDBL_HAS_QUIET_NAN__ 1
+#define __FLOAT128__ 1
+#define __SIZEOF_FLOAT128__ 16
+#define __GXX_WEAK__ 1
+#define __FLT_HAS_DENORM__ 1
+#define __DBL_HAS_DENORM__ 1
+#define __LDBL_HAS_DENORM__ 1
+#define _GLIBCXX_GTHREAD_USE_WEAK 0
+#define __CHAR16_TYPE__ unsigned short
+#define __CHAR32_TYPE__ unsigned int
+#define __INT_LEAST8_TYPE__ signed char
+#define __INT_LEAST16_TYPE__ short int
+#define __INT_LEAST32_TYPE__ int
+#define __INT_LEAST64_TYPE__ long int
+#define __UINT_LEAST8_TYPE__ unsigned char
+#define __UINT_LEAST16_TYPE__ short unsigned int
+#define __UINT_LEAST32_TYPE__ unsigned int
+#define __UINT_LEAST64_TYPE__ long unsigned int
+#define __INT_FAST8_TYPE__ signed char
+#define __UINT_FAST8_TYPE__ unsigned char
+#define __INT_FAST16_TYPE__ long int
+#define __INT_FAST32_TYPE__ long int
+#define __UINT_FAST16_TYPE__ long unsigned int
+#define __UINT_FAST32_TYPE__ long unsigned int
+#define __INT_FAST64_TYPE__ long int
+#define __UINT_FAST64_TYPE__ long unsigned int
+#define __FLT_DECIMAL_DIG__ 9
+#define __DBL_DECIMAL_DIG__ 17
+#define __INTMAX_TYPE__ long int
+#define __UINTMAX_TYPE__ long unsigned int
+#define __ATOMIC_RELAXED 0
+#define __ATOMIC_CONSUME 1
+#define __ATOMIC_ACQUIRE 2
+#define __ATOMIC_RELEASE 3
+#define __ATOMIC_ACQ_REL 4
+#define __ATOMIC_SEQ_CST 5
+#define unix 1
+#define __unix__ 1
+#define __PTRDIFF_TYPE__ long int
+#define __SIZE_TYPE__ unsigned long int
+#define __INTPTR_TYPE__ long int
+#define __UINTPTR_TYPE__ unsigned long int
+#define __WCHAR_MAX__ 0x7fffffff
+#define __WCHAR_MIN__ (-__WCHAR_MAX__ - 1)
+#define __WCHAR_TYPE__ int
+#define __linux__ 1
+#define __unix 1
+#define linux 1
+#define __linux 1
+#define __NO_MATH_INLINES 1
+#define __LP64__ 1
+#define __x86_64 1
+#define __x86_64__ 1
+#define __amd64 1
+#define __amd64__ 1
+#define __k8 1
+#define __k8__ 1
+#define __MMX__ 1
+#define __SSE__ 1
+#define __SSE2__ 1
+#define __SSE3__ 1
+#define __SSSE3__ 1
+#define __SSE4A__ 1
+#define __ABM__ 1
+#define __SSE4_2__ 1
+#define __AVX__ 1
+#define __AVX2__ 1
+#define __FMA__ 1
+#define __XSAVE__ 1
+#define __POPCNT__ 1
+#define __FXSR__ 1
+#define __PGI 1
+#define __NVCOMPILER 1
+#define _PGCG_SOURCE 1
+#define __PGLLVM__ 1
+#define __NVCOMPILER_LLVM__ 1
+#define __extension__ 
+#define __PIC__ 1
+#define __pgnu_vsn 90300
+#define __PREPROCESS_ONLY__ 1
+#define __gnu_linux__ 1
+#define __GXX_EXPERIMENTAL_CXX0X__ 1
+#define __GCC_ATOMIC_TEST_AND_SET_TRUEVAL 1
+#define __GCC_ATOMIC_BOOL_LOCK_FREE 2
+#define __GCC_ATOMIC_CHAR_LOCK_FREE 2
+#define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
+#define __GCC_ATOMIC_CHAR8_T_LOCK_FREE 2
+#define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 2
+#define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 2
+#define __GCC_ATOMIC_SHORT_LOCK_FREE 2
+#define __GCC_ATOMIC_INT_LOCK_FREE 2
+#define __GCC_ATOMIC_LONG_LOCK_FREE 2
+#define __GCC_ATOMIC_LLONG_LOCK_FREE 2
+#define __GCC_ATOMIC_POINTER_LOCK_FREE 2
+#define __USER_LABEL_PREFIX__ 
+#define _GLIBCXX_TXN_SAFE 
+#define _GLIBCXX_TXN_SAFE_DYN 
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
+#define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
+#define __ORDER_BIG_ENDIAN__ 4321
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#define __ORDER_PDP_ENDIAN__ 3412
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
+#define __PGI_CPLUS_PREINCLUDE__ 1
+#define __builtin_va_list __pgi_va_list
+#define __builtin_va_start(ap,param) (__builtin_pgi_va_start(ap, param))
+#define __builtin_va_arg(ap,type) (*(type*)__builtin_pgi_va_arg(ap, (type*)0))
+#define __builtin_va_copy(dst,src) ((dst)[0] = (src)[0])
+#define __builtin_va_end(ap) ((void)0)
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/AbstractTask.h -o moc_AbstractTask.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_AbstractTask.o moc_AbstractTask.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/ColumnTextFile.h -o moc_ColumnTextFile.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_ColumnTextFile.o moc_ColumnTextFile.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/ColumnTextParser.h -o moc_ColumnTextParser.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_ColumnTextParser.o moc_ColumnTextParser.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/EventRestrictor.h -o moc_EventRestrictor.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_EventRestrictor.o moc_EventRestrictor.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/Leds.h -o moc_Leds.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_Leds.o moc_Leds.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/ParallelLoop.h -o moc_ParallelLoop.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_ParallelLoop.o moc_ParallelLoop.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/ScriptContext.h -o moc_ScriptContext.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_ScriptContext.o moc_ScriptContext.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/Thread.h -o moc_Thread.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_Thread.o moc_Thread.cpp
+/opt/Qt/5.14.2/gcc_64/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB --include /home/pejman/RF_SWD_HV_MT/gpell/moc_predefs.h -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell -I/home/pejman/RF_SWD_HV_MT/gpell/includeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include includeFiles/ThreadTimer.h -o moc_ThreadTimer.cpp
+nvc++ -c -O2 -fPIC -Wall -Wextra -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I. -I. -IincludeFiles -I/opt/Qt/5.14.2/gcc_64/include -I/opt/Qt/5.14.2/gcc_64/include/QtGui -I/opt/Qt/5.14.2/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/opt/Qt/5.14.2/gcc_64/mkspecs/linux-g++ -o moc_ThreadTimer.o moc_ThreadTimer.cpp
+rm -f libgpell.a
+ar cqs libgpell.a ell_gpell.o moc_AbstractTask.o moc_ColumnTextFile.o moc_ColumnTextParser.o moc_EventRestrictor.o moc_Leds.o moc_ParallelLoop.o moc_ScriptContext.o moc_Thread.o moc_ThreadTimer.o
+make[1]: Leaving directory '/data/pejman/RF_SWD_HV_MT_joint/gpell'
+/bin/cp ./gpell/*.a ./obj/
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c data_type.f90 -o ./obj/data_type.o 
+/bin/cp data_type.mod ./ray3d/
+(cd ./ray3d/;mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c ray3d_par.f90 -o ray3d_par.o ./obj/data_type.o ;)
+ray3d_par.f90:
+/bin/cp ./ray3d/ray3d_par.mod .
+(cd ./ray3d/;mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c ray3d_com.f90 -o ray3d_com.o ./obj/data_type.o ray3d_par.o ;)
+ray3d_com.f90:
+/bin/cp ./ray3d/ray3d_com.mod .
+(cd ./ray3d/;make;)
+make[1]: Entering directory '/data/pejman/RF_SWD_HV_MT_joint/ray3d'
+mpifort -C -c ./ray3d.f
+mpifort -C -c ./theo.f90
+mpifort -C -c ./four1.f
+mpifort -C -c ./qlayer.f90
+make[1]: Leaving directory '/data/pejman/RF_SWD_HV_MT_joint/ray3d'
+/bin/cp ./ray3d/ray3d.o .
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c rjmcmc_com.f90 -o ./obj/rjmcmc_com.o ./obj/data_type.o 
+rjmcmc_com.f90:
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c -o ./obj/alloc_obj.o alloc_obj.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c -o ./obj/read_input.o read_input.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/quicksort.o quicksort.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c -o ./obj/loglhood.o loglhood.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/nrtype.o nrtype.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/nr.o nr.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/nrutil.o nrutil.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/svdcmp.o svdcmp.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/mod_sac_io.o mod_sac_io.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/four1.o four1.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/fourrow.o fourrow.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/realft.o realft.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/convlv.o convlv.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/pythag.o pythag.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/UPDATE_MAPfile.o UPDATE_MAPfile.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/xcorr.o xcorr.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/Zxcorr.o Zxcorr.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/COVmatEst.o COVmatEst.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/ZCOVmatEst.o ZCOVmatEst.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib  -lQt5Gui -lQt5Core -lGL -lpthread -c -o ./obj/UpdateCOV.o UpdateCOV.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c -o ./obj/MT1DforwardB3.o MT1DforwardB3.f90
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread   -c -o ./obj/prjmh_temper_rf.o prjmh_temper_rf.f90 
+mpifort -C  -Wl,-rpath,/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -Wl,-rpath,/opt/Geopsy.org/lib -Wl,-rpath,/opt/Qt/5.14.2/gcc_64/lib  -lstdc++ -L/opt/nvidia/hpc_sdk/Linux_x86_64/21.5/compilers/lib  -llapack -lblas -L/opt/Geopsy.org/lib -lQGpCoreTools -lQGpCoreMath -lQGpCoreWave -L/opt/Qt/5.14.2/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread    -o ./bin/prjmh_temper_rf ray3d/ray3d.o ray3d/ray3d_com.o ray3d/ray3d_par.o ray3d/theo.o ray3d/qlayer.o ./obj/data_type.o ./obj/rjmcmc_com.o ./obj/alloc_obj.o ./obj/read_input.o ./obj/loglhood.o ./obj/nrtype.o ./obj/nr.o ./obj/nrutil.o ./obj/svdcmp.o ./obj/mod_sac_io.o ./obj/four1.o ./obj/fourrow.o ./obj/realft.o ./obj/convlv.o ./obj/quicksort.o ./obj/pythag.o ./obj/UPDATE_MAPfile.o ./obj/xcorr.o ./obj/Zxcorr.o ./obj/COVmatEst.o ./obj/ZCOVmatEst.o ./obj/UpdateCOV.o ./obj/MT1DforwardB3.o ./obj/prjmh_temper_rf.o ./obj/libraysum.a ./obj/libswd.a ./obj/libgpell.a 
