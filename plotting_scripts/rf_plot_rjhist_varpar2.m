@@ -1444,43 +1444,43 @@ plot_prior_VpVs = 0;
 plot_prior_res = 0;
 
 xxlim = [0. .058];  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.55 for sim 0.11 and .8 (.175) for real
-%%set bounds
-% pmin2 = pmin; %bounds are priors
-% pmax2 = pmax;
+%set bounds
+pmin2 = pmin; %bounds are priors
+pmax2 = pmax;
 
-% % xlims_min = [4.1 pmin(1) 1.7];  % sim7 %%[Vs VpVs log_/rho]
-% % xlims_max = [5. pmax(1) 3.3];
-% % xlims_min = [3. pmin(1) 2.8];  % sim8 %%[Vs VpVs log_/rho]
-% % % % xlims_max = [5. pmax(1) 3.2];
-% % xlims_min = [pmin(1) pmin(1) 2.];  % sim9 %%[Vs VpVs log_/rho]
-% % xlims_max = [pmax(1) pmax(1) 5.];
-% % xlims_min = [pmin(1) pmin(1) 1.];  % sim9 %%[Vs VpVs log_/rho]
-% % xlims_max = [pmax(1) pmax(1) 4.];
-% % xlims_min = [1. pmin(1) .5]; %real %%[Vs VpVs log_/rho]
-% % xlims_max = [4.5  pmax(1) 3.6];
-% xlims_min = [3. pmin(1) 2.5];  % sim9 %%[Vs VpVs log_/rho]
-% xlims_max = [pmax(1) pmax(1) 3.5];
-xlims_min = [pmin(1) pmin(1) .5]; %real %%[Vs VpVs log_/rho]
-xlims_max = [pmax(1)  pmax(1) 3.5];
-if (iseis==1 && ivpvs==1); xlims_min(2) = pmin(2); xlims_max(2) = pmax(2);end
-pmin2 = [];
-pmax2 = [];
-if iseis == 1
-    pmin2 = [pmin2; xlims_min(1)];
-    pmax2 = [pmax2; xlims_max(1)];
-    if ivpvs == 1
-       pmin2 = [pmin2; xlims_min(2)];
-       pmax2 = [pmax2; xlims_max(2)];
-    end
-end
-if imt == 1
-pmin2 = [pmin2; xlims_min(3)];
-pmax2 = [pmax2; xlims_max(3)];
-end
-
-XTick_res =  [1.:1.:4.];
-XTick_Vs = [1.:1.:6.];
-XTick_VpVs = [1.7:.3:2.];
+% % % xlims_min = [4.1 pmin(1) 1.7];  % sim7 %%[Vs VpVs log_/rho]
+% % % xlims_max = [5. pmax(1) 3.3];
+% % % xlims_min = [3. pmin(1) 2.8];  % sim8 %%[Vs VpVs log_/rho]
+% % % % % xlims_max = [5. pmax(1) 3.2];
+% % % xlims_min = [pmin(1) pmin(1) 2.];  % sim9 %%[Vs VpVs log_/rho]
+% % % xlims_max = [pmax(1) pmax(1) 5.];
+% % % xlims_min = [pmin(1) pmin(1) 1.];  % sim9 %%[Vs VpVs log_/rho]
+% % % xlims_max = [pmax(1) pmax(1) 4.];
+% % % xlims_min = [1. pmin(1) .5]; %real %%[Vs VpVs log_/rho]
+% % % xlims_max = [4.5  pmax(1) 3.6];
+% % xlims_min = [3. pmin(1) 2.5];  % sim9 %%[Vs VpVs log_/rho]
+% % xlims_max = [pmax(1) pmax(1) 3.5];
+% xlims_min = [pmin(1) pmin(1) .5]; %real %%[Vs VpVs log_/rho]
+% xlims_max = [pmax(1)  pmax(1) 3.5];
+% if (iseis==1 && ivpvs==1); xlims_min(2) = pmin(2); xlims_max(2) = pmax(2);end
+% pmin2 = [];
+% pmax2 = [];
+% if iseis == 1
+%     pmin2 = [pmin2; xlims_min(1)];
+%     pmax2 = [pmax2; xlims_max(1)];
+%     if ivpvs == 1
+%        pmin2 = [pmin2; xlims_min(2)];
+%        pmax2 = [pmax2; xlims_max(2)];
+%     end
+% end
+% if imt == 1
+% pmin2 = [pmin2; xlims_min(3)];
+% pmax2 = [pmax2; xlims_max(3)];
+% end
+% 
+% XTick_res =  [1.:1.:4.];
+% XTick_Vs = [1.:1.:6.];
+% XTick_VpVs = [1.7:.3:2.];
 %isyn = 0;
 opts = struct('bounds','tight','LockAxes',1, ...
               'Width',8,'Height',4.8,'Color','cmyk',...
