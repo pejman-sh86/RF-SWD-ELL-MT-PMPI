@@ -1,0 +1,103 @@
+DSlabel = {'MT','SWD','RF'};
+NDAT = [22 50 215];
+DSlabelinv = {'M','SM','RSM'};
+% Npanel=length(DSlabel);
+Npanel = 3;
+Pmax = [.11 .08 .08];
+% Pmax = [.085 .085 .085];
+
+add_det = 1;
+logdets = { [-456.967326 -454.199569 -451.266263] [0. -368.188977 -368.311022] [0. 0. -1.3746e3 -1.6824e3] };
+% logdets = { [-456.967326 -454.199569 -451.266263] [0. -368.188977 -368.311022] [0. 0. -1.3746e3 -1.6824e3] };
+MSR = 0;
+RMS = 0;
+
+
+fig=figure;
+color = [1. 0. 0.;...
+         0. 1. 0.;...
+         0. 0. 0.;...
+         0. 0. 1.];
+
+font_size = 30;
+font_size2 = 23;
+nx=Npanel; ny=2; ipanely=1; 
+xim = 0.05; yim = 0.01;
+xymarg = [0.1 0.04 0.04 0.1];
+[loc,spw,sph] = get_loc(nx,ny,xim,yim,xymarg);
+% spw = spw - 0.005;
+% spw2 = spw;
+% spw = spw*9./10.;
+% for ipanel=2:nx
+%         loc(1,ipanel+(ipanely-1)*nx) = loc(1,ipanel+(ipanely-1)*nx) - (ipanel-1)*(spw2-spw);
+% end
+% XTick = [0:5:10];
+
+%%
+
+NDS = length(DSlabel);
+NDSinv = length(DSlabelinv);
+logLA = cell(NDSinv, NDS);
+
+for iDS = 1:NDS
+    for iDSinv = 1:NDSinv
+        try
+%         load( strcat(strcat(strcat(DSlabelinv{iDSinv},'_logL_'),DSlabel{iDS}),'.dat') );
+        logL2 = load( strcat(DSlabelinv{iDSinv},'_logL_',DSlabel{iDS},'.dat') );
+        logLA{iDSinv,iDS} = logL2(:,1);
+        if(MSR==1 || RMS==1)
+            logLA{iDSinv,iDS} = -( logL2(:,2) + logLA{iDSinv,iDS} ) / NDAT(iDS);
+            if( ~strcmp(DSlabel{iDS},'MT')  ); logLA{iDSinv,iDS}=logLA{iDSinv,iDS}*2.; end
+            if(RMS==1); logLA{iDSinv,iDS} = sqrt( logLA{iDSinv,iDS} ); end
+        elseif(add_det==1)
+            logLA{iDSinv,iDS} = logLA{iDSinv,iDS} - logdets{iDS}(iDSinv); 
+        end
+        catch
+          logLA{iDSinv,iDS} = [];
+        end
+    end
+end
+
+%%
+
+for ipanel = 1:nx
+    if ipanel <= NDS
+    h1 = subplot('Position',[loc(1,ipanel+(ipanely-1)*nx) loc(2,ipanel+(ipanely-1)*nx) spw sph]);
+    hold on; box on;
+    set(gca,'FontSize',font_size);
+%      if(ipanel>1);set(gca,'YTickLabel',[]);end
+     if(ipanel>NDS);set(gca,'YTickLabel',[]);end
+     if(ipanel>NDS); set(gca,'XTickLabel',[]);end
+
+%      if ipanel <= NDS
+         
+         minlogLA2=[]; maxlogLA2=[];
+         for iDSinv = 1:NDSinv
+             logLA2 = logLA{iDSinv, ipanel};
+             if ~isempty(logLA2)
+                 [n,lim]=hist(logLA2,50);n = [0, n, 0];lim = [lim(1) lim lim(end)];
+                 n = n/sum(n);
+                 lim = lim - (lim(3)-lim(2))/2;
+%                  [xx,yy]=stairs(lim,n,'k');
+%                  patch(xx,yy,[0.8,0.8,0.8]);
+                 stairs(lim,n,'Color', color(iDSinv,:));
+                 clear n lim;
+                 minlogLA2 = [minlogLA2 min(logLA2)];
+                 maxlogLA2 = [maxlogLA2 max(logLA2)];
+             end
+         end
+         if(~isempty(maxlogLA2) && add_det==1); set(gca,'XLim',[min(minlogLA2)-0. max(maxlogLA2)+0.]); end
+         if(~isempty(maxlogLA2) && (MSR==1 || RMS==1)); set(gca,'XLim',[0. max(maxlogLA2)+0.]); end
+%          minlim=[.0 .0 .2]; if(~isempty(maxlogLA2) && (MSR==1 || RMS==1)); set(gca,'XLim',[minlim(ipanel) max(maxlogLA2)+0.]); end
+         set(gca,'YLim',[0., Pmax(ipanel)]);
+         set(gca,'TickDir','in');
+         if (ipanel==1); ylabel('Probability'); end
+         if (MSR==1); xlabel('Mean squared residuals','FontSize',font_size2); end
+        if (RMS==1); xlabel('RMS','FontSize',font_size2); end
+         if (add_det==1); xlabel('Log likelihood','FontSize',font_size2); end
+         if (ipanel==1); legend('MT','SWD-MT','RF-SWD-MT','FontSize',16); end
+%          if (ipanel==3); legend('RF-SWD-MT','RF','FontSize',18); end
+
+     end
+
+end

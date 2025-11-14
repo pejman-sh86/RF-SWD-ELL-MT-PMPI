@@ -1,0 +1,40 @@
+Rmx = 600;
+Zmx = 300;
+NRAN = 51;
+NDEP = 25;
+x_evn = [0:1/(NRAN-1):1];
+z_evn = [0:1/(NDEP-1):1];
+x_ev = x_evn*Rmx;
+z_ev = z_evn*Zmx;
+z_ev = z_ev';
+mapfile = 'maule_data_map.dat';
+map=dlmread(mapfile);
+kmap = map(1,1);
+mapvoro = map(2:end-1,:);
+
+x  = mapvoro(:,1);
+z  = mapvoro(:,2);
+%c_evmap(:,:) = ctru;
+%r_evmap(:,:) = rtru;
+%a_evmap(:,:) = atru;
+xn = mapvoro(:,1)/Rmx;
+zn = mapvoro(:,2)/Zmx;
+c  = mapvoro(:,3);
+r  = mapvoro(:,4);
+a  = mapvoro(:,5);
+%% Plot MAP
+for iz = 1:NDEP;
+  dz = z_evn(iz)-zn;
+  for ir = 1:NRAN;
+    dx = x_evn(ir)-xn;
+    d  = sqrt(dx.*dx + dz.*dz);
+    [dmin,iv] = min(d);
+    c_evmap(iz,ir) = mapvoro(iv,3);
+    r_evmap(iz,ir) = mapvoro(iv,4);
+    a_evmap(iz,ir) = mapvoro(iv,5);
+  end;
+end;
+figure();hold on;
+imagesc(x_ev,z_ev,c_evmap);
+colorbar;
+plot(x,z,'Ow')

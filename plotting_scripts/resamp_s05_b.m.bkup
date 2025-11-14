@@ -1,0 +1,135 @@
+function [] = resamp();
+
+outfile  = strcat('x_s05_1_4_32_5lay.mat');
+outfilea = strcat('x_s05_1_4_32_5lay.txt');
+
+nang_re = 130;
+%load blje5_5_sl_idaf_nb_smooth.mat;
+load blje5_5_bl_ping_ida_nb_smooth.mat;
+%idx = [10,13,17,21,27,33,43,53,67];
+%idx = [10,13,17,21,27,33,43,53];
+idx = [5,6,8,10,13,17,21,27,33,43];
+nf = length(idx);
+theta = thav1(1:244,77);
+R = xavg1(1:244,idx);
+
+minlim = [0.5, 1450, 1450, 1.2, 1.3, 0.001, 0.001];
+maxlim = [1.35, 1550, 1550, 1.6, 1.8, 1.000, 1.000];
+
+%minlim = [0.5, 1450, 1450, 1.2, 1.3, 0.001, 1450, 1.2, 0.001];
+%maxlim = [2.0, 1550, 1550, 1.6, 1.8, 1.000, 1550, 1.8, 1.000];
+
+%minlim = [0.05   1450.000   1.200   0.001 ...
+%          0.05   1450.000   1.200   0.001 ...
+%          0.05   1450.000   1.400   0.001 ...
+%                 1450.000   1.400   0.001];
+%maxlim = [1.00   1520.000   1.700   1.000 ...
+%          1.00   1520.000   1.800   1.000 ...
+%          1.00   1520.000   1.800   1.000 ...
+%                 1520.000   1.900   1.000];
+
+%minlim = [0.05,  1450.000,  1.200, 0.001,...
+%          0.05,  1450.000,  1.200, 0.001,...
+%          0.05,  1450.000,  1.400, 0.001,...
+%          0.05,  1450.000,  1.400, 0.001,...
+%                 1450.000,  1.400, 0.001];
+%maxlim = [0.75,  1520.000,  1.600, 1.000,...
+%          0.75,  1520.000,  1.700, 1.000,...
+%          0.75,  1520.000,  1.800, 1.000,...
+%          0.75,  1520.000,  1.800, 1.000,...
+%                 1520.000,  1.900, 1.000];
+
+%minlim = [0.05,  1450.000,  1.200, 0.001,...
+%          0.05,  1450.000,  1.200, 0.001,...
+%          0.05,  1450.000,  1.400, 0.001,...
+%          0.05,  1450.000,  1.400, 0.001,...
+%          0.05,  1450.000,  1.400, 0.001,...
+%                 1450.000,  1.400, 0.001];
+%maxlim = [0.75,  1520.000,  1.600, 1.000,...
+%          0.75,  1520.000,  1.700, 1.000,...
+%          0.75,  1520.000,  1.800, 1.000,...
+%          0.75,  1520.000,  1.800, 1.000,...
+%          0.75,  1520.000,  1.800, 1.000,...
+%                 1520.000,  1.900, 1.000];
+
+mtrue  = minlim+(maxlim-minlim)/2.;
+
+thdiff = diff(theta);
+idx2 = find(thdiff == 0);
+theta(idx2) = [];
+R(idx2,:) = [];
+
+theta_even = [theta(1):(theta(end)-theta(1))/nang_re:theta(end)];
+
+Rex = -1*(isnan(R)-1);
+
+for ifr = 1:nf
+   R(find(Rex(:,ifr) == 0),ifr) = 0;
+end
+clear Rex;
+Rex = ones(length(theta_even),nf);
+for ifr = 1:nf
+
+   R_even(:,ifr)   = interp1(theta,R(:,ifr),theta_even);
+   Rex(find(R_even(:,ifr) == 0),ifr) = 0;
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Save data
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+F(1).cw = 1510.7;
+F(1).rw = 1.029;
+
+F(1).freq = freq(idx);
+for ifr = 1:nf;
+    F(ifr).dat = R_even(:,ifr);
+    F(ifr).ang = theta_even;
+end
+
+
+F(1).minlim = minlim;
+F(1).maxlim = maxlim;
+F(1).mtrue  = mtrue;
+F(1).Rex    = Rex;
+F(1).nmod   = length(F(1).maxlim);
+
+save(outfile,'F');
+save(outfilea,'minlim','-ascii');
+save(outfilea,'maxlim','-ascii','-append');
+save(outfilea,'mtrue','-ascii','-append');
+for i = 1:nf
+
+    tmp = F(i).dat';
+    save(outfilea,'tmp','-ascii','-append');
+
+end
+ang = F(1).ang(1:size(Rex,1));
+save(outfilea,'ang','-ascii','-append');
+
+for i = 1:nf
+
+    tmp = F(1).Rex(:,i)';
+    save(outfilea,'tmp','-ascii','-append');
+
+end
+
+for i = 1:nf
+
+   figure(1);
+   subplot(3,3,i);hold on;box on;
+   plot(theta,R(:,i),'.k');
+   plot(theta_even(:),R_even(:,i),'or');
+   figure(2);
+   subplot(3,3,i);hold on;box on;
+   idx = find(Rex(:,i)==1);
+   plot(theta,R(:,i),'.k');
+   plot(theta_even(idx),R_even(idx,i),'or');
+
+end;
+
+
+return;

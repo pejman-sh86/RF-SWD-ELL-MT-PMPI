@@ -1,0 +1,77 @@
+function [ref] = ref_nlay2(thd, geo,freq)
+%    [ref] = ref_nlay2(thd, geo,freq)
+%    [ref] = ref_nlay2(1:90, geo_sin,[200 1000 4000])
+%
+% compute the plane wave reflection coefficient for arbitrary number of isospeed layers
+%
+% thd is grazing angle in degrees
+% "geo" contains environmental data, e.g., 
+%   thickness    speed    attenuation    density
+%     (m)        (m/s)    (dB/m/kHz)      (g/cc)
+%
+% geo=[NaN        1511          0          1.03
+%     1.7         1500        0.015        1.45
+%     2.8         1555         0.1         1.7 
+%     0.6         1600         0.1         2.0
+%     NaN         1565         0.01        1.9];
+%
+% "freq" is frequencies
+% ref is magnitude of the plane wave pressure reflection coefficient (BL =-20 log10 (ref))
+%
+% Charles W. Holland - June 2003
+
+
+c=geo(:,2);
+alf=geo(:,3);
+r=geo(:,4);
+d=geo(2:end-1,1);
+
+clear i
+dB2nep=2*pi*20*1000/log(10);
+v=1./(1./c + alf*i/dB2nep); % force radiation condition to be satisfied
+nlay=length(c)-1;
+th1=thd*pi/180;
+
+z=zeros(length(c),length(thd));th=z;
+z(1,:)=r(1)*c(1)./sin(th1); %since incident angles are real so must z1
+for m=2:length(c)
+  th(m,:)=acos( cos(th1)*v(m)/c(1) );
+  z(m,:)=r(m)*v(m)./sin(th(m,:));
+end
+
+nfrq=length(freq);
+for n=1:nfrq
+  k=2*pi*freq(n)./v;
+  
+  if nlay==1; % halfspace problem
+    ref(n,:)=(z(2,:) - z(1,:) )./(z(2,:) + z(1,:));
+  else
+      
+  %COMPUTE input impedance
+  tankd= tan( k(nlay)*d(nlay-1)*sin(th(nlay,:)  ) );
+  zin = z(nlay,:).*(z(nlay+1,:)-i*z(nlay,:).*tankd)./(z(nlay,:) - i*z(nlay+1,:).*tankd);
+
+  for m=nlay:-1:3
+    tankd= tan( k(m-1)*d(m-2)*sin(th(m-1,:)  ) );
+    zin = z(m-1,:).*(zin -i*z(m-1,:).*tankd)./(z(m-1,:) - i*zin.*tankd);
+  end
+ ref(n,:)=(zin-z(1,:))./(zin+z(1,:));
+ end
+end 
+
+ref=abs(ref);
+
+%plotting paramters
+amx = 90;  atk=15; ymn=0;  ymx=50; ylab=1:3:24; colr='bgrckmbgrckmbgrckm';
+
+if nfrq<15
+       subplot(2,2,2)
+ for n=1:nfrq  
+   plot(thd,-20*log10(abs(ref(n,:))),colr(n)); hold on 
+ end
+   axis([0 amx ymn ymx]); 
+   legend([num2str(freq') repmat(' Hz',size(freq'))])  
+    xlabel('Grazing Angle (deg)');ylabel('|R| (dB)')
+   set(gca,'Position',[.5,0.2,0.4,0.4])
+end 
+

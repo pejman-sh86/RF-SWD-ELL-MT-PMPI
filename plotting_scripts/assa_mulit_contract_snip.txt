@@ -1,0 +1,44 @@
+There are two code sniplets that do the multiple contractions in ASSA.
+The idea is to not accept more than 50% of the models but also to not
+reject more that 80%.
+
+If I reject too much, do multiple contraction:
+
+if (nsimp .gt. 5*npert) then
+
+         write(6,*) 'Multiple Contraction'
+         fac = 0.5
+         do j=1,ndim+1
+            if (j .ne. ilo) then
+               do i=1,ndim
+                  ssum(i)=fac*(simp(j,i)+simp(ilo,i))
+                  simp(j,i)=ssum(i)
+               enddo
+               call forward(ssum,Etry,pobs,ptry,chol)
+               E(j)=Etry
+            endif
+         enddo
+         do i=1,ndim
+            sum = 0.
+            do j=1,ndim+1
+               sum=sum+simp(j,i)
+            enddo
+            ssum(i)=sum
+         enddo
+         factor=factor*0.75
+         nsimp = 1
+      endif
+
+
+If I accept too much, make perturbation step bigger:
+
+      if (nsimp .lt. 2*npert) then
+         itest = 0
+         do j=1,ndim
+            if (pert_ave(j) .ge. maxpert(j)) itest = 1
+         enddo
+         if (itest .eq. 0)  factor = factor/Tfact**2
+      endif
+
+
+

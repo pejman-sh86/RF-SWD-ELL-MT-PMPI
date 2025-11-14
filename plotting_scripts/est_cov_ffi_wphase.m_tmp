@@ -1,0 +1,295 @@
+function [] = est_cov_mat_ffi_wphase(filebase);
+set(0, 'DefaultFigurePaperPosition', [0 0 11 8]);
+%
+% Test real data:
+%
+% UNCOMMENT SAVE STATEMENT!!!!
+%
+inonstat = 1;    % Switch to turn on non-stationary sampling
+fact   = 1.5;
+isave  = 1;
+isavep = 1;
+
+datfile     = strcat(filebase,'.hdf5');
+sdfile      = strcat(filebase,'_nonstat_sd.dat');
+logfile     = strcat(filebase,'_covmat.log');
+covmatfile  = strcat(filebase,'_icovmat.dat');
+covmatfile2 = strcat(filebase,'_covmat.mat');
+mapfile     = strcat(filebase,'_map.dat');
+repfile     = strcat(filebase,'_replica.dat');
+
+fid = fopen(logfile,'w');
+
+NSTN  = h5readatt(datfile,'/Observed_data','N_sta');
+deltt = h5readatt(datfile,'/Observed_data','Sample_rate');
+hyp_loc = h5read(datfile,'/Observed_data/Hypo_Loc');
+dhyp  = h5readatt(datfile,'/Sensitivity_kernel','Hyp_interval');
+NRAN  = h5readatt(datfile,'/Sensitivity_kernel','N_subf_x');
+NDEP  = h5readatt(datfile,'/Sensitivity_kernel','N_subf_y');
+Rmx   = h5readatt(datfile,'/Sensitivity_kernel','max_x');
+Zmx   = h5readatt(datfile,'/Sensitivity_kernel','max_y');
+Vrmin = h5readatt(datfile,'/Sensitivity_kernel','V_r_min');
+Vrmax = h5readatt(datfile,'/Sensitivity_kernel','V_r_max');
+dat = h5read(datfile,'/Observed_data/displacements');
+dat = dat';
+NTSMP = h5read(datfile,'/Observed_data/Ntraces');
+NDAT = length(dat)
+
+rep = dlmread(repfile);
+res = dat(1,:)-rep(3,:);
+if(inonstat == 1);sd2 = dlmread(sdfile);end;
+
+voro_map = dlmread(mapfile);
+
+kvoro = voro_map(1,1);
+NPV = 5;
+
+M = kvoro*NPV;
+
+fid = fopen(logfile,'w');
+
+%
+% loop over stations
+%
+k = 1;
+
+nx = 12;
+ny = 5;
+xim = 0.01;
+yim = 0.01;
+xymarg = [0.08 0.04 0.02 0.08];
+[loc,spw,sph] = get_loc(nx,ny,xim,yim,xymarg);
+
+nx2 = 6;
+ny2 = 5;
+xim2 = 0.01;
+yim2 = 0.01;
+xymarg2 = [0.08 0.04 0.02 0.08];
+[loc2,spw2,sph2] = get_loc(nx2,ny2,xim2,yim2,xymarg2);
+
+for istn = 1:NSTN
+  iend(istn) = sum(NTSMP(1:istn));
+  istart(istn) = iend(istn)-NTSMP(istn)+1;
+
+  N = NTSMP(istn);
+  N2 = double(N)-(double(M)/double(NSTN));
+  sd(istn) = std(dat(1,istart(istn):iend(istn)));
+  res2(istart(istn):iend(istn)) = res(istart(istn):iend(istn)) - mean(res(istart(istn):iend(istn)));
+
+  if(inonstat == 1);
+    res2(istart(istn):iend(istn)) = res2(istart(istn):iend(istn))./sd2(istn,1:N);
+  end;
+
+  %
+  % Calc autocovariance:
+  %
+  [Aresres,lag1] = xcov(res2(istart(istn):iend(istn)));
+  Aresres = Aresres/N2;
+  %------------------------------------------------
+  %  Damping
+  %------------------------------------------------
+  x = cos(pi*[-N+1:N-1]./(2*N-1)).^fact;
+  gc0 = figure(1);
+  plot(x);
+  Aresres = Aresres .* x(1:end);
+
+%
+% Set up covariance matrix in a diagonal form:
+%
+  npad = 1; %% forces end of cov mat to zero
+  sd3 = zeros(N,(2*N)-1);
+  for idat = 1:(2*N)-1
+    sd3(:,idat) = Aresres(idat)*ones(N,1);
+  end
+  sd3(:,1:npad) = 0;
+  sd3(:,(2*N)-npad:(2*N)-1) = 0;
+  E = diag(ones(N,1));
+  Chat = zeros(N,N);
+  Chat = spdiags(sd3,-N+1:N-1,Chat);
+
+  if(inonstat == 1);
+      for idat = 1:N
+      for jdat = 1:N
+          Chat(idat,jdat) = Chat(idat,jdat)*sd2(istn,idat)*sd2(istn,jdat);
+      end;end;
+  end;
+
+  Csave = E*Chat;
+
+  F(istn).csave = Csave;
+%
+% Decompose that thing, L3 is UPPER triangular matrix:
+%
+  L3 = chol(Csave);
+%
+% Uncorrelate/pre-whiten the residuals:
+%
+  reshat(istart(istn):iend(istn)) = inv(L3')*res(istart(istn):iend(istn))';
+  reshat(istart(istn):iend(istn)) = reshat(istart(istn):iend(istn))/std(reshat(istart(istn):iend(istn)));
+  [Aresres2,lag2] = xcov(reshat(istart(istn):iend(istn)));
+  Aresres2 = Aresres2/N2;
+  
+  gc1 = figure(2);hold on;
+  subplot('Position',[loc(1,k) loc(2,k) spw sph]);hold on;box on;
+  plot(lag1,Aresres/(max(Aresres)),'-k.')
+  plot([lag1(1) lag2(end)],[0 0],'--k');
+  text(20,.8,['Station' num2str(istn)],'FontSize',12)
+  set(gca,'YTick',[-0.5 0 0.5 1],'FontSize',14);
+  set(gca,'YTickLabel',[],'FontSize',14);
+  set(gca,'XTick',[-100 0 100],'FontSize',14);
+  set(gca,'XTickLabel',[],'FontSize',14);
+  set(gca,'XLim',[-N N],'YLim',[-.6 1.1]);
+  set(gca,'FontSize',14);
+  subplot('Position',[loc(1,k+1) loc(2,k+1) spw sph]);hold on;box on;
+  plot(lag2,Aresres2/(max(Aresres2)),'-k.')
+  plot([lag2(1) lag2(end)],[0 0],'--k');
+  text(20,0.8,['Station' num2str(istn)],'FontSize',12)
+  set(gca,'YTick',[-0.5 0 0.5 1],'FontSize',14);
+  set(gca,'YTickLabel',[],'FontSize',14);
+  set(gca,'XTick',[-100 0 100],'FontSize',14);
+  set(gca,'XTickLabel',[],'FontSize',14);
+  set(gca,'XLim',[-N N],'YLim',[-.6 1.1]);
+  set(gca,'FontSize',14);
+
+  x = -6.375:.1:6.375;
+  xx = -6.25:.01:6.25;
+  gc2 = figure(3);
+  hold on;
+  subplot('Position',[loc(1,k) loc(2,k) spw sph]);
+  hold on;box on;
+  [n1,xout] = hist(res2(istart(istn):iend(istn))/sd(istn),x);
+  area = sum(n1) * (xout(2)-xout(1));
+  n1 = n1/area;
+  stairs(xout,n1,'k');
+  nd = 1/sqrt(2*pi)*exp(-(xx.^2)/2);
+  plot(xx,nd,'--k')
+  text(1,0.55,['Station' num2str(istn)],'FontSize',12)
+  set(gca,'XTick',[-4 0 4],'FontSize',14);
+  set(gca,'XTickLabel',[],'FontSize',14);
+  ylabel('','FontSize',14);
+  set(gca,'YTick',[0 0.5],'FontSize',14);
+  set(gca,'YTickLabel',[],'FontSize',14);
+  axis([-6 6 0 0.6]);
+  set(gca,'FontSize',14);
+
+  subplot('Position',[loc(1,k+1) loc(2,k+1) spw sph]);
+  set(gca,'XTick',[-4 0 4],'FontSize',14);
+  set(gca,'XTickLabel',[],'FontSize',14);
+  set(gca,'YTick',[0 0.5],'FontSize',14);
+  set(gca,'YTickLabel',[],'FontSize',14);
+  hold on;box on;
+  std(res2(istart(istn):iend(istn)))
+  std(reshat(istart(istn):iend(istn)))
+  [n1,xout] = hist(reshat(istart(istn):iend(istn)),x);
+  area = sum(n1) * (xout(2)-xout(1));
+  n1 = n1/area;
+  stairs(xout,n1,'k');
+  plot(xx,nd,'--k')
+  text(1,0.55,['Station' num2str(istn)],'FontSize',12)
+  axis([-6 6 0 0.6]);
+  set(gca,'FontSize',14);
+
+  gc4 = figure(4);
+  hold on;
+  subplot('Position',[loc2(1,istn) loc2(2,istn) spw2 sph2]);
+  hold on;box on;
+  plot(res2(istart(istn):iend(istn)),'b');
+  plot(reshat(istart(istn):iend(istn)),'--r');
+  plot([0 N],[0 0],'--k');
+  %set(gca,'FontSize',14,'YLim',[min(res2) max(res2)],'XLim',[0 N]);
+
+  [h,p] = runstest(res2(istart(istn):iend(istn)));
+  fprintf(1,'%2.0f',istn);fprintf(1,'\t uncorrected:\t');
+  fprintf(1,'%7.4f  %12.6f',h,p);
+  fprintf(fid,'%2.0f',istn);
+  fprintf(fid,'%7.4f  %7.4f',h,p);
+  if h == 0
+    fprintf(1,'\t runs passed');
+    fprintf(fid,'  runs passed');
+  else
+    fprintf(1,'\t runs failed');
+    fprintf(fid,'  runs failed');
+  end
+  fprintf(1,'\n');
+
+  [h,p] = kstest(res2(istart(istn):iend(istn)));
+  fprintf(fid,'   ks:');
+  fprintf(fid,' %7.4f ',h,p);
+  if h == 0
+    fprintf(1,'\t ks passed');
+    fprintf(fid,' ks passed');
+  else
+    fprintf(1,'\t ks failed');
+    fprintf(fid,'  ks failed');
+  end
+  fprintf(1,'%8.4f',h,p);
+  fprintf(1,'\n');
+  fprintf(fid,'\n');
+
+  [h,p] = runstest(reshat(istart(istn):iend(istn)));
+  fprintf(1,'%2.0f',istn);fprintf(1,'\t corrected:\t');
+  fprintf(1,'%7.4f  %12.6f',h,p);
+  fprintf(fid,'%2.0f',istn);
+  fprintf(fid,'%7.4f  %7.4f',h,p);
+  if h == 0
+    fprintf(1,'\t runs passed');
+    fprintf(fid,'  runs passed');
+  else
+    fprintf(1,'\t runs failed');
+    fprintf(fid,'  runs failed');
+  end
+  fprintf(1,'\n');
+
+  [h,p] = kstest(reshat(istart(istn):iend(istn)));
+  fprintf(fid,'  ks:');
+  fprintf(fid,' %7.4f ',h,p);
+  if h == 0
+    fprintf(1,'\t ks passed');
+    fprintf(fid,'  ks passed');
+  else
+    fprintf(1,'\t ks failed');
+    fprintf(fid,'  ks failed');
+  end
+  fprintf(1,'%8.4f',h,p);
+  fprintf(1,'\n');
+  fprintf(1,'\n');
+  fprintf(fid,'\n');
+
+  k = k+2;
+
+end
+
+if(isavep == 1)
+%    saveas(gc1,plotfile1,'epsc2');
+%    saveas(gc2,plotfile2,'epsc2');
+%    saveas(gc3,plotfile3,'epsc2');
+%    saveas(gc1,plotfile1,'png');
+%    saveas(gc2,plotfile2,'png');
+%    saveas(gc3,plotfile3,'png');
+end
+
+%
+%  Saves both, inverse and orgiginal Cov mat.
+%
+if(isave == 1)
+    save(covmatfile2,'F');
+
+    covmat = inv(F(1).csave);
+    save(covmatfile,'covmat','-ascii');
+    for istn = 2:NSTN
+
+        covmat = inv(F(istn).csave);
+        save(covmatfile,'covmat','-ascii','-append');
+
+    end;
+
+    for istn = 1:NSTN
+
+        covmat = F(istn).csave;
+        save(covmatfile,'covmat','-ascii','-append');
+
+    end;
+
+end;
+save tmp.mat;
+return;

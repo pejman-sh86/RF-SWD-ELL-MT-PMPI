@@ -1,0 +1,191 @@
+function [] = est_cov_non();
+%
+% Test real data:
+%
+% UNCOMMENT SAVE STATEMENT!!!!
+%
+dex = 0;
+fact = 1;
+istat = 1;
+isave  = 1;
+isavep = 1;
+
+base = 'x_s05_1_8_32_0lay_';
+data_file     = 'x_s05_1_8_32_0lay.mat';
+data_file_txt = 'x_s05_1_8_32_0lay.txt';
+cov_mat_file  = 'x_s05_1_8_32_0lay_cov.txt';
+cov_mat_file2 = 'x_s05_1_8_32_0lay_cov.mat';
+logfile       = 'x_s05_1_8_32_0lay_cov.log';
+sdfile        = 'x_s05_1_8_32_0lay_sdev.txt';
+replicafile   = 'x_s05_1_8_32_0lay_rep.dat';
+residualfile  = 'x_s05_1_8_32_0lay_res.txt';
+plotfile1     = 'x_s05_1_8_32_0lay_axx.png';
+plotfile2     = 'x_s05_1_8_32_0lay_ks.png';
+plotfile3     = 'x_s05_1_8_32_0lay_cum.png';
+ibl = 1;
+
+fid = fopen(logfile,'w');
+load('critical_values.mat');
+
+load(data_file);
+[B] = read_r_replica(replicafile);
+[F] = read_r_replica(data_file_txt);
+
+nfreq = length(F(1).NDPF)
+if nfreq <= 9
+  spw = .26; sph = .26;
+  llw_tmp = [0.10 0.40 0.7];
+  llw = [llw_tmp llw_tmp llw_tmp];
+  llh = [0.69 0.42 0.15];
+else
+  spw = .195; sph = .26;
+  llw_tmp = [0.05 0.285 0.52 0.755];
+  llw = [llw_tmp llw_tmp llw_tmp];
+  llh = [0.69 0.42 0.15];
+end
+
+k = 1;
+
+%
+% loop over freqs 315-1600 Hz
+%
+for ifreq = 1:nfreq
+%for ifreq = 4:4
+  widths = 4.;
+  widthe = 15.;
+%  res = B(ifreq).diff-mean(B(ifreq).diff);
+  F(ifreq).res = F(ifreq).dat-B(ifreq).dat;
+  for i = 1:F(1).NDPF(ifreq)-1
+    F(ifreq).angdiff(i) = F(ifreq).ang(i+1) - F(ifreq).ang(i);
+  end
+  Q = (F(1).NDPF(ifreq)*(F(1).NDPF(ifreq)+1)/2)-F(1).NDPF(ifreq)+1;
+
+%
+%  CALC COV:
+%
+  [scnew,dscnew,sdang,dC,sc,rscnew,rdscnew,sd,x,C,fact] = ...
+  acov_non(F(ifreq).res,F(ifreq).ang,widths,widthe,ifreq);
+
+  fact
+  F(ifreq).csave = dC;
+
+  L = chol(dC);
+
+%%
+%% compute standardized residuals
+%%
+  F(ifreq).reshat = inv(L')*F(ifreq).res(:,ifreq);
+
+  figure(2);hold on;
+   if ifreq <= length(llw)/3
+     subplot('Position',[llw(ifreq) llh(1) spw sph]);
+   elseif ifreq <= (length(llw)/3)*2
+     subplot('Position',[llw(ifreq) llh(2) spw sph]);
+   else
+     subplot('Position',[llw(ifreq) llh(3) spw sph]);
+   end
+  hold on;box on;
+  plot(sdang,dscnew,'.k');
+  plot(sdang,scnew,'.');
+  plot(sdang,scnew+sd,'--r');
+  plot(sdang,scnew-sd,'--r');
+  plot([0 70],[0 0],'k')
+  set(gca,'XLim',[0,sdang(end)]);
+
+  figure(3);hold on;
+   if ifreq <= length(llw)/3
+     subplot('Position',[llw(ifreq) llh(1) spw sph]);
+   elseif ifreq <= length(llw)/3*2
+     subplot('Position',[llw(ifreq) llh(2) spw sph]);
+   else
+     subplot('Position',[llw(ifreq) llh(3) spw sph]);
+   end
+  hold on;box on;
+  plot(F(ifreq).ang,C(1,:));
+  plot(F(ifreq).ang,dC(1,:),'k');
+  plot([0 130],[0 0],'k');
+  set(gca,'XLim',[F(ifreq).ang(1) F(ifreq).ang(end)]);
+  legend('orig','damped')
+
+  figure(4);hold on;
+   if ifreq <= length(llw)/3
+     subplot('Position',[llw(ifreq) llh(1) spw sph]);
+   elseif ifreq <= length(llw)/3*2
+     subplot('Position',[llw(ifreq) llh(2) spw sph]);
+   else
+     subplot('Position',[llw(ifreq) llh(3) spw sph]);
+   end
+  hold on; box on;
+  h = pcolor(F(ifreq).ang,F(ifreq).ang,C);
+  set(h,'EdgeColor','flat');
+%  shading interp
+  grid off
+  colorbar
+  set(gca,'YDir','reverse','XLim',[F(ifreq).ang(1),F(ifreq).ang(end)],'YLim',[F(ifreq).ang(1),F(ifreq).ang(end)])
+  figure(5);hold on;
+   if ifreq <= length(llw)/3
+     subplot('Position',[llw(ifreq) llh(1) spw sph]);
+   elseif ifreq <= length(llw)/3*2
+     subplot('Position',[llw(ifreq) llh(2) spw sph]);
+   else
+     subplot('Position',[llw(ifreq) llh(3) spw sph]);
+   end
+  hold on; box on;
+  h = pcolor(F(ifreq).ang,F(ifreq).ang,dC);
+  set(h,'EdgeColor','flat');
+%  shading interp
+  grid off
+  colorbar
+  set(gca,'YDir','reverse','XLim',[F(ifreq).ang(1),F(ifreq).ang(end)],'YLim',[F(ifreq).ang(1),F(ifreq).ang(end)])
+  figure(7);hold on;
+   if ifreq <= length(llw)/3
+     subplot('Position',[llw(ifreq) llh(1) spw sph]);
+   elseif ifreq <= length(llw)/3*2
+     subplot('Position',[llw(ifreq) llh(2) spw sph]);
+   else
+     subplot('Position',[llw(ifreq) llh(3) spw sph]);
+   end
+  hold on;box on;
+  plot(x,'x');
+%  plot(y,'xk');
+  plot([0 90],[0 0],'k')
+
+  k = k + 2;
+  clear IDX IDX2 sIDX Q ;
+end
+
+if(isavep == 1)
+%    saveas(gc1,plotfile1,'epsc2');
+%    saveas(gc2,plotfile2,'epsc2');
+%    saveas(gc3,plotfile3,'epsc2');
+%   saveas(gc1,plotfile1,'png');
+%   saveas(gc2,plotfile2,'png');
+%   saveas(gc3,plotfile3,'png');
+end
+
+%
+%  Saves both, inverse and orgiginal Cov mat.
+%
+if(isave == 1)
+    save(cov_mat_file2,'F');
+
+    covmat = inv(F(1).csave);
+    save(cov_mat_file,'covmat','-ascii');
+    for ifreq = 2:nfreq
+
+        covmat = inv(F(ifreq).csave);
+        save(cov_mat_file,'covmat','-ascii','-append');
+
+    end;
+
+    for ifreq = 1:nfreq
+
+        covmat = F(ifreq).csave;
+        save(cov_mat_file,'covmat','-ascii','-append');
+
+    end;
+
+end;
+return;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

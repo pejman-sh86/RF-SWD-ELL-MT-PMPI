@@ -1,0 +1,88 @@
+%================================================================
+%   FORWARD.M
+%================================================================
+function [E,Fm] = forward_hol_lay(m,F);
+%
+% Setting up the environment in the (nlay+2)x4 Array geo_sin:
+%
+
+z_t = 177.65
+nfreq = length(F(1).freq);
+if(F(1).nmod == 3)
+  % 1-Layer model
+  h  = [ NaN    NaN ]';
+  c  = [F(1).cw m(1)]';
+  r  = [F(1).rw m(2)]';
+  a  = [   0    m(3)]';
+elseif(F(1).nmod == 7)
+  % 2-Layer model
+  h  = [ NaN    m(1) NaN ]';
+  c  = [F(1).cw m(2) m(5)]';
+  r  = [F(1).rw m(3) m(6)]';
+  a  = [   0    m(4) m(7)]';
+elseif(F(1).nmod == 11)
+  %  3-Layer model
+  h  = [ NaN    m(1) m(5) NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(9) ]';
+  r  = [F(1).rw m(3) m(7) m(10)]';
+  a  = [   0    m(4) m(8) m(11)]';
+elseif(F(1).nmod == 15)
+  %  4-Layer model
+  h  = [ NaN    m(1) m(5) m(9)  NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(10) m(13)]';
+  r  = [F(1).rw m(3) m(7) m(11) m(14)]';
+  a  = [   0    m(4) m(8) m(12) m(15)]';
+elseif(F(1).nmod == 19)
+  %  5-Layer model
+  h  = [ NaN    m(1) m(5) m(9)  m(13) NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(10) m(14) m(17)]';
+  r  = [F(1).rw m(3) m(7) m(11) m(15) m(18)]';
+  a  = [   0    m(4) m(8) m(12) m(16) m(19)]';
+elseif(F(1).nmod == 23)
+  %  6-Layer model
+  h  = [ NaN    m(1) m(5) m(9)  m(13) m(17) NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(10) m(14) m(18) m(21)]';
+  r  = [F(1).rw m(3) m(7) m(11) m(15) m(19) m(22)]';
+  a  = [   0    m(4) m(8) m(12) m(16) m(20) m(23)]';
+elseif(F(1).nmod == 27)
+  %  7-Layer model
+  h  = [ NaN    m(1) m(5) m(9)  m(13) m(17) m(21) NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(10) m(14) m(18) m(22) m(25)]';
+  r  = [F(1).rw m(3) m(7) m(11) m(15) m(19) m(23) m(26)]';
+  a  = [   0    m(4) m(8) m(12) m(16) m(20) m(24) m(27)]';
+elseif(F(1).nmod == 31)
+  %  7-Layer model
+  h  = [ NaN    m(1) m(5) m(9)  m(13) m(17) m(21) m(25) NaN  ]';
+  c  = [F(1).cw m(2) m(6) m(10) m(14) m(18) m(22) m(26) m(29)]';
+  r  = [F(1).rw m(3) m(7) m(11) m(15) m(19) m(23) m(27) m(30)]';
+  a  = [   0    m(4) m(8) m(12) m(16) m(20) m(24) m(28) m(31)]';
+end
+
+geo = [h      c         a./(c/1000)      r];
+%
+% Compute reflectivity:
+%
+
+E = 1;
+for i=1:nfreq
+
+    thd = F(1).ang;
+
+    [Rs, Rp] = spherical_refl_fav(geo,z_t,F(1).freq(i),thd);
+%    [Rs, Rp] = spherical_refl(geo,z_t,F(1).freq(i),thd);
+  
+%    spher_r = -20*log10(abs(Rs));
+%    plane_r = -20*log10(abs(Rp));
+    spher_r = abs(Rs);
+    plane_r = abs(Rp);
+
+    Fm(i).dat = reshape(spher_r,length(spher_r),1);
+    Fm(i).plane = reshape(plane_r,length(plane_r),1);
+    F(i).dat = reshape(F(i).dat,length(F(i).dat),1);
+
+end
+
+return
+% ---------------------------------------------------------------
+% ...this is the end my fiend.
+% EOF

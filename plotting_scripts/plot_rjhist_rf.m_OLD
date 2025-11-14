@@ -1,0 +1,933 @@
+function [] = plot_rjhist_rf(filename);
+
+imarg   = 1; %% Plot depth-marginal distributions?
+inorm1  = 1; %% Normalize profile marginals line by line
+inorm2  = 1; %% Normalize profile marginals line by line
+Tstar   = 1.;
+isyn    = 1;
+imap    = 0;
+imead   = 0;
+imean   = 0;
+imax    = 0;
+isave   = 1;   % Save plots?
+idatfit = 0;   % Plot data misfit maps?
+iari    = 0;   % Plot ARI residuals?
+icov    = 2;
+
+filebase    = strrep(filename,'sample.mat','')
+datafile    = 'fort.3'
+repfile     = strcat(filebase,'replica.dat')
+resfile     = strcat(filebase,'residuals.dat')
+resfilear     = strcat(filebase,'residualsar.dat')
+resfileari    = strcat(filebase,'residualsari.dat')
+plotfile1   = strcat(filebase,'sigma.')
+plotfile2   = strcat(filebase,'arma.')
+plotfile4   = strcat(filebase,'number_interfaces.')
+plotfile5   = strcat(filebase,'logL.')
+plotfile6   = strcat(filebase,'transdim_marg_prof.')
+plotfile7   = strcat(filebase,'data.')
+plotfile8   = strcat(filebase,'axx.')
+plotfile9   = strcat(filebase,'resmap.')
+plotfile10  = strcat(filebase,'resarmap.')
+plotfile11  = strcat(filebase,'resarimap.')
+%plotfile12  = strcat(filebase,'reshist.')
+%plotfile13  = strcat(filebase,'reshist.')
+plotext1    = 'fig';
+plotext2    = 'png';
+plotext3    = 'eps';
+
+corefile    = 'core.mat';
+
+%% DELTA SITE: 
+hmax    = 101.;
+
+hmax2    = hmax;
+%hmax2    = 25.;
+
+icore   = 0;
+NBANDS =  1;
+pmin = [1.50  2.4 1.5]';
+pmax = [2.50  4.0 5.0]';
+thinstep = 100;
+
+load(filename);
+if(icov == 3)
+   order = 1;
+   armin = -0.6*ones(1,NBANDS);
+   armax = 0.95*ones(1,NBANDS);
+else
+   order = 1;
+end;
+
+if(icore == 1)
+    load(corefile);
+end;
+
+mtru = [ 1.4,     1.71,        2.7,      3.1,...
+         3.6,     1.75,        2.7,      3.6,...
+        11.0,     1.74,        2.7,      3.8,...
+         4.0,     1.71,        2.7,      3.4,...
+         6.5,     1.73,        2.7,      4.1,...
+         3.0,     1.74,        2.7,      4.3,...
+         9.0,     1.71,        2.7,      4.5,...
+         6.0,     1.83,        2.7,      3.5,...
+         2.5,     1.74,        2.7,      4.6,...
+         4.5,     1.76,        2.7,      4.1,...
+                  1.74,        2.7,      4.7];
+
+NPROF = length(A);
+BURNIN = ceil(NPROF/3);
+%BURNIN = 2000;
+%BURNIN = 1;
+A = A(BURNIN:end,:);
+NPROF = length(A);
+%NPROF = 1e3;
+
+%%
+%% Random permutation of sample is only applied to data fit computation
+%%
+idxran = randperm(length(A));
+%A = A(idxran,:);
+disp('Done lodaing data.');
+
+k = A(:,4);
+
+NFP = (k*4)+3;
+%m = A(:,5:end-7-5-order*NBANDS-1);
+m = A(:,5:end-5-order*NBANDS-1);
+
+if(icov == 3)
+   (size(A,2)-6-order*NBANDS+1:size(A,2)-6)
+   alpha = A(:,end-6-(order*NBANDS)+1:end-6);
+end
+
+logL = A(:,1);
+if(imap == 1);
+   [logLmap,jmap] = max(logL);
+   kmap = k(jmap);
+   NFPmap = NFP(jmap);
+   mmap = m(jmap,1:NFPmap);
+end;
+
+for i = 1:size(A,1);
+   sd(i) = m(i,NFP(i)+1);
+   idxh = [0:k(i)-1]*4+1;
+   h(i) = sum(m(i,idxh));
+   clear idxh;
+end
+disp('Done getting sigma.');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% SIGMA PLOT
+%%
+figw = 8;
+figh = 4;
+fig1=figure('visible','on');
+set(fig1,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+nx = 2;
+ny = 1;
+xim = 0.01;
+yim = 0.06;
+xymarg = [0.1 0.04 0.04 0.14];
+[loc,spw,sph] = get_loc(nx,ny,xim,yim,xymarg);
+h1 = subplot('Position',[loc(1,1) loc(2,1) spw sph]);
+hold on; box off;
+set(gca,'FontSize',12);
+h2 = subplot('Position',[loc(1,2) loc(2,2) spw sph]);
+hold on; box off;
+set(gca,'FontSize',12);
+subplot(h1);hold on;box on;
+plot([1:thinstep:length(sd)],sd(1:thinstep:end),'k');
+ylabel('Data error standard deviation');
+xlabel('rjMCMC step');
+set(gca,'XLim',[0 length(sd)])
+set(gca,'YLim',[0 12])
+
+subplot(h2);hold on;box on;
+[n,lim]=hist(sd,100);n = [0, n, 0];lim = [lim(1) lim lim(end)];
+n = n/sum(n);
+[xx,yy]=stairs(n,lim,'k');
+patch(xx,yy,[0.8,0.8,0.8]);
+stairs(n,lim,'k');
+clear n lim;
+xlabel('rjMCMC probability');
+set(gca,'YTickLabel',[])
+set(gca,'YLim',[0 12])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% ALPHA PLOT
+%%
+if(icov == 3)
+   save tst alpha;
+   figw = 12;
+   figh = 8;
+   fig2=figure('visible','on');
+   set(fig2,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   nx = NBANDS;
+   ny = 3;
+   xim = 0.01;
+   yim = 0.01;
+   xymarg = [0.1 0.04 0.04 0.1];
+   [loc,spw,sph] = get_loc(nx,ny,xim,yim,xymarg);
+   for i=1:NBANDS
+      for j=1:order
+         h1 = subplot('Position',[loc(1,i+(j-1)*NBANDS) loc(2,i+(j-1)*NBANDS) spw sph]);
+         hold on; box off;
+         set(gca,'FontSize',12);
+%      h2 = subplot('Position',[loc(1,i+order) loc(2,i+order) spw sph]);
+%      hold on; box off;
+%      set(gca,'FontSize',12);
+%      subplot(h1);hold on;box on;
+%      plot([1:thinstep:length(alpha(:,i))],alpha(1:thinstep:end,i),'k');
+%      if(i==1);ylabel('AR coefficient');end;
+%      xlabel('rjMCMC step');
+%      if(i>1);set(gca,'YTickLabel',[]);end;
+%      set(gca,'XLim',[0 length(alpha)])
+%      set(gca,'YLim',[-1 1])
+
+         subplot(h1);hold on;box on;
+         [n,lim]=hist(alpha(:,(i-1)*order+j),60);n = [0, n, 0];lim = [lim(1) lim lim(end)];
+         n = n/sum(n);
+         [xx,yy]=stairs(n,lim,'k');
+         patch(xx,yy,[0.8,0.8,0.8]);
+         stairs(n,lim,'k');
+         clear n lim;
+         if(j==order);xlabel('Probability');end;
+         if(i==1);ylabel('AR coefficient');end;
+         if(i>1);set(gca,'YTickLabel',[]);end;
+         if(j<order);set(gca,'XTickLabel',[]);end;
+         set(gca,'XLim',[0 0.08]);
+         set(gca,'YLim',[-.6 1]);
+      end;
+   end;
+end;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% K PLOT
+%%
+figw = 5;
+figh = 5;
+fig4=figure('visible','on');
+set(fig4,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+subplot(2,1,1);hold on;box on;
+set(gca,'FontSize',12);
+plot([1:thinstep:length(k)],k(1:thinstep:end),'k')
+ylabel('No. interfaces');
+xlabel('rjMCMC step');
+set(gca,'XLim',[0 length(k)])
+set(gca,'YLim',[0 20.5])
+
+subplot(2,1,2);hold on;box on;
+set(gca,'FontSize',12);
+[n,lim]=hist(k,[0:25]);n = [0, n, 0];lim = [lim(1) lim lim(end)];
+n = n/sum(n);
+lim = lim-0.5;
+[xx,yy]=stairs(lim,n,'k');
+patch(xx,yy,[0.8,0.8,0.8]);
+stairs(lim,n,'k');
+clear n lim;
+xlabel('No. interfaces');
+ylabel('Probability');
+set(gca,'XLim',[-0.5 20.5]);
+set(gca,'YLim',[0 .7])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% logL PLOT
+%%
+figw = 8;
+figh = 4;
+fig5=figure('visible','on');
+set(fig5,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+subplot(1,2,1);hold on;box on;
+set(gca,'FontSize',12);
+plot([1:thinstep:length(logL)],logL(1:thinstep:end),'k');
+ylabel('log Likelihood');
+xlabel('rjMCMC step');
+set(gca,'XLim',[0 length(logL)])
+set(gca,'YLim',[400 700])
+
+subplot(1,2,2);hold on;box on;
+set(gca,'FontSize',12);
+[n,lim]=hist(logL,100);n = [0, n, 0];lim = [lim(1) lim lim(end)];
+n = n/sum(n);
+[xx,yy]=stairs(n,lim,'k');
+patch(xx,yy,[0.8,0.8,0.8]);
+stairs(n,lim,'k');
+clear n lim;
+xlabel('Probability');
+set(gca,'YLim',[400 700])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% COMPUTE PROFILE MARGINALS
+%%
+NPARL = 4;
+if(imarg == 1)
+   NZ = 200;
+   nsmooth = ceil(NZ/80.);
+   NC = 200;
+   NR = 200;
+   NA = 200;
+   clim = pmin(1)+cumsum((pmax(1)-pmin(1))/NC*ones(1,NC));
+   rlim = pmin(2)+cumsum((pmax(2)-pmin(2))/NR*ones(1,NR));
+   alim = pmin(3)+cumsum((pmax(3)-pmin(3))/NA*ones(1,NA));
+
+   dz = hmax/(NZ-1);
+   z = cumsum(dz*ones(1,NZ))-dz;
+
+   h = zeros(1,NZ);
+   c = zeros(NPROF,NZ);
+   r = zeros(NPROF,NZ);
+   a = zeros(NPROF,NZ);
+   disp('Sample size: '),disp(size(m))
+   for iprof = 1:NPROF
+
+     if(rem(iprof,5000)==0)
+        fprintf(1,'%8i',iprof)
+     end
+     clear idxh idxc idxr idxa prof;
+     %% Find index for current model
+     if(k(iprof) > 0)
+        idxh = (([1:k(iprof)]-1)*NPARL)+1;
+        idxc = (([1:k(iprof)]-1)*NPARL)+2;
+        idxr = (([1:k(iprof)]-1)*NPARL)+3;
+        idxa = (([1:k(iprof)]-1)*NPARL)+4;
+        idxh = [idxh idxh(end)];
+        idxc = [idxc idxc(end)+3];
+        idxr = [idxr idxr(end)+3];
+        idxa = [idxa idxa(end)+3];
+     else
+        idxh = [];
+        idxc = [1];
+        idxr = [2];
+        idxa = [3];
+     end
+
+     %% Compute the profile for current model
+     if(k(iprof) > 0)
+        prof(1:k(iprof),1) = cumsum(m(iprof,idxh(1:end-1)),2);
+        prof(k(iprof)+1,1) = prof(k(iprof),1)+m(iprof,idxh(end));
+     else
+        prof(1,1) = hmax;
+     end
+     prof(:,2) = m(iprof,idxc);
+     prof(:,3) = m(iprof,idxr);
+     prof(:,4) = m(iprof,idxa);
+
+     c(iprof,:) = prof(1,2);
+     r(iprof,:) = prof(1,3);
+     a(iprof,:) = prof(1,4);
+     for ilay=2:k(iprof)+1  %% k is # layers of current model
+        if(round(prof(ilay-1,1)/dz) > 0);
+           idxz = round(prof(ilay-1,1)/dz);
+        else;
+           idxz = 1;
+        end;
+        h(idxz)     = h(idxz) + 1;
+        c(iprof,idxz:end) = prof(ilay,2);
+        r(iprof,idxz:end) = prof(ilay,3);
+        a(iprof,idxz:end) = prof(ilay,4);
+     end;
+   end;
+   fprintf(1,'\n')
+   disp('Done with profiles.');
+
+   %
+   % Compute histograms for each depth
+   %
+   disp('Starting histograms...');
+   for iz=1:NZ
+%      Nc(iz,:) = histc_tstar(c(:,iz),logL,clim,Tstar);
+%      Nr(iz,:) = histc_tstar(r(:,iz),logL,rlim,Tstar);
+%      Na(iz,:) = histc_tstar(a(:,iz),logL,alim,Tstar);
+      Nc(iz,:) = histc(c(:,iz),clim);
+      Nr(iz,:) = histc(r(:,iz),rlim);
+      Na(iz,:) = histc(a(:,iz),alim);
+   end;
+   %
+   % Normalize Histograms
+   %
+   if(inorm1 == 1)
+      for iz=1:NZ
+         Nc(iz,:) = Nc(iz,:)/max(Nc(iz,:));
+         Nr(iz,:) = Nr(iz,:)/max(Nr(iz,:));
+         Na(iz,:) = Na(iz,:)/max(Na(iz,:));
+%         Nc(iz,:) = Nc(iz,:)/NPROF;
+%         Nr(iz,:) = Nr(iz,:)/NPROF;
+%         Na(iz,:) = Na(iz,:)/NPROF;
+      end;
+   elseif(inorm2 == 2)
+      Nc = Nc/max(max(Nc));
+      Nr = Nr/max(max(Nr));
+      Na = Na/max(max(Na));
+   end;
+   disp('Done histograms.');
+
+c_mean = mean(c);
+r_mean = mean(r);
+a_mean = mean(a);
+c_mead = median(c);
+r_mead = median(r);
+a_mead = median(a);
+
+[ntmp,idxcmax] = max(Nc,[],2);
+[ntmp,idxrmax] = max(Nr,[],2);
+[ntmp,idxamax] = max(Na,[],2);
+for iz=1:NZ
+   c_max(iz) = clim(idxcmax(iz));
+   r_max(iz) = rlim(idxrmax(iz));
+   a_max(iz) = alim(idxamax(iz));
+end;
+NAVE = 8;
+for i=1:length(c_max)
+   if(i <= NAVE)
+       NAVE1 = 1;
+   else
+       NAVE1 = i-NAVE;
+   end
+   if(i >= length(c_max)-NAVE)
+       NAVE2 = length(c_max);
+   else
+       NAVE2 = i+NAVE;
+   end
+   c_max_sm(i) = sqrt(mean(c_max(NAVE1:NAVE2).^2));
+   r_max_sm(i) = sqrt(mean(r_max(NAVE1:NAVE2).^2));
+   a_max_sm(i) = sqrt(mean(a_max(NAVE1:NAVE2).^2));
+end
+
+end; % end imarg
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% PLOT PROFILE MARGINALS
+%%
+%nx = 4;
+%ny = 1;
+%xim = 0.01;
+%yim = 0.06;
+%xymarg = [0.1 0.04 0.04 0.14];
+opts = struct('bounds','tight','LockAxes',1, ...
+              'Width',8,'Height',4.8,'Color','cmyk',...
+              'Renderer','painters','Format','png',...
+              'FontMode','fixed','FontSize',12,'FontEncoding','adobe');
+%[loc,spw,sph] = get_loc(nx,ny,xim,yim,xymarg);
+
+loc = [0.08,  0.18, 0.4533, 0.7266;...
+      0.14, 0.14, 0.14, 0.14];
+spw1 = 0.09;
+spw2 = 0.2633;
+sph = 0.82;
+
+figw = 12;
+figh = 8;
+fig6 = figure('visible','on');hold on; box on;
+set(fig6,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+set(fig6, 'renderer', 'painters')
+h4 = subplot('Position',[loc(1,1) loc(2,1) spw1 sph]);
+hold on; box off;
+h1 = subplot('Position',[loc(1,2) loc(2,2) spw2 sph]);
+hold on; box off;
+h2 = subplot('Position',[loc(1,3) loc(2,3) spw2 sph]);
+hold on; box off;
+h3 = subplot('Position',[loc(1,4) loc(2,4) spw2 sph]);
+hold on; box off;
+
+subplot(h4);hold on;box on;
+if(imarg == 1)
+   h = h/sum(h);
+   [xx,yy]=stairs([0,h],[0,z],'-k');
+   patch(xx,yy,[0.8,0.8,0.8]);
+   [xx,yy]=stairs([0,h],[0,z],'-k');
+   set(gca,'Fontsize',12,'YLim',[0 hmax2]);
+   set(gca,'YDir','reverse');
+   xlabel('Interface probability');
+   ylabel('Depth (km)');
+   box on;
+end;
+
+
+subplot(h1)
+set(gca,'FontSize',12);
+if(imarg == 1)
+   pcolor(clim,z,Nc);shading flat;
+   if(imead == 1);plot(c_mead,z,'.k','Linewidth',2);end;
+   if(imean == 1);plot(c_mean,z,'.k','Linewidth',2);end;
+end;
+%surf(clim,z,Nc);shading flat;
+set(h1,'layer','top','CLim',[0 1])
+set(gca,'Fontsize',12,'XLim',[pmin(1) pmax(1)],'YLim',[0 hmax2]);
+set(gca,'YDir','reverse');
+xlabel('Vp/Vs (km/s)');
+if(isyn == 1)
+   plprof(mtru,hmax,'-k',1,0);
+   plprof(mtru,hmax,'--w',1,0);
+end;
+if(imap == 1)
+   plprof(mmap,hmax,'--k',1,0);
+end;
+if(imax == 1)
+  for i=1:length(z);
+     [cmx,j] = max(Nc(i,:));
+     c_max(i) = clim(j);
+  end;
+  plot(c_max,z,'w');
+end;
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[1.5 1.75 2.0 2.25 2.5]);
+set(gca,'XTick',[1.5 1.75 2.0 2.25 2.5]);
+box on;
+
+subplot(h2)
+set(gca,'FontSize',12);
+if(imarg == 1)
+   pcolor(rlim,z,Nr);shading flat;
+   if(imead == 1);plot(r_mead,z,'.k','Linewidth',2);end;
+   if(imean == 1);plot(r_mean,z,'.k','Linewidth',2);end;
+end;
+%surf(rlim,z,Nr);shading flat;
+set(h2,'layer','top','CLim',[0 1])
+set(gca,'Fontsize',12,'XLim',[pmin(2) pmax(2)],'YLim',[0 hmax2]);
+set(gca,'YDir','reverse');
+xlabel('Density (g/ccm)');
+if(isyn == 1)
+   plprof(mtru,hmax,'-k',2,0);
+   plprof(mtru,hmax,'--w',2,0);
+end
+if(imap == 1)
+   plprof(mmap,hmax,'--k',2,0);
+end
+if(imax == 1)
+  for i=1:length(z);
+     [rmx,j] = max(Nr(i,:));
+     r_max(i) = rlim(j);
+  end;
+  plot(r_max,z,'w');
+end;
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[2.5 3.0 3.5 4.0]);
+set(gca,'XTick',[2.5 3.0 3.5 4.0]);
+box on;
+
+subplot(h3)
+set(gca,'FontSize',12);
+if(imarg == 1)
+   pcolor(alim,z,Na);shading flat;
+   if(imead == 1);plot(a_mead,z,'.k','Linewidth',2);end;
+   if(imean == 1);plot(a_mean,z,'.k','Linewidth',2);end;
+end;
+%surf(alim,z,Na);shading flat;
+set(h3,'layer','top','CLim',[0 1])
+set(gca,'Fontsize',14,'XLim',[pmin(3) pmax(3)],'YLim',[0 hmax2]);
+set(gca,'YDir','reverse');
+xlabel('Vs (km/s)');
+if(isyn == 1)
+   plprof(mtru,hmax,'-k',3,0);
+   plprof(mtru,hmax,'--w',3,0);
+end;
+if(imap == 1)
+   plprof(mmap,hmax,'--k',3,0);
+end;
+if(imax == 1)
+  for i=1:length(z);
+     [amx,j] = max(Na(i,:));
+     a_max(i) = alim(j);
+  end;
+  plot(a_max,z,'w');
+  save('max_model.mat','z','c_max','r_max','a_max');
+end;
+set(gca,'YTickLabel',[]);
+set(gca,'XTickLabel',[2.0 3.0 4.0 5.0]);
+set(gca,'XTick',[2.0 3.0 4.0 5.0]);
+%cmap = colormap(flipud(gray));
+cmap = colormap(jet);
+%cmap(1,:) = [1 1 1];
+colormap(cmap);
+%colorbar('peer',h1,'location','WestOutside');
+box on;
+
+if(icore == 1)
+   subplot(h1);
+   if(hmax < 100.);
+      plot(core(:,2),core(:,1),'-k','Linewidth',2);
+      plot(core(:,2),core(:,1),'--w','Linewidth',2);
+   else
+      plot(scpt_14(:,2),scpt_14(:,1),'-k','Linewidth',2);
+      plot(scpt_14(:,2),scpt_14(:,1),'--w','Linewidth',2);
+%      plot(scpt_15(:,2),scpt_15(:,1),'-k','Linewidth',2);
+%      plot(scpt_15(:,2),scpt_15(:,1),'--w','Linewidth',2);
+%      plot(scpt_16(:,2),scpt_16(:,1),'-k','Linewidth',2);
+%      plot(scpt_16(:,2),scpt_16(:,1),'--w','Linewidth',2);
+      plot(bore(:,2),bore(:,1),'-k','Linewidth',2);
+      plot(bore(:,2),bore(:,1),'--w','Linewidth',2);
+   end;
+end;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  COMPUTE DATA FIT
+%%
+if(idatfit == 1)
+
+   tmp = load(datafile);
+   dobs   = tmp(2:end,2);
+   fobs   = tmp(2:end,1);
+   dfobs = [diff(fobs)];
+   fobsplt = [fobs(1)-dfobs(1);fobs;fobs(end)+dfobs(end)]-([dfobs(1);dfobs(1);dfobs;dfobs(end)]./2.);
+   rep = load(repfile);
+   res = load(resfile);
+   resar = load(resfilear);
+   if(iari == 1);resari = load(resfileari);end;
+
+   for j=1:size(rep,1);
+      [axx(j,:),axxlags(j,:)] = xcorr(res(j,:),'coeff');
+   end;
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT DATA MISFIT
+   %%
+   figw = 6;
+   figh = 4;
+   fig7 = figure('visible','on');hold on;
+   set(fig7,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   set(gca,'FontSize',12,'layer','top')
+   NVS = 800;
+   if(hmax > 100.);
+      vsmin = 81;
+      vsmax = 460;
+   else;
+      vsmin = 30;
+      vsmax = 360;
+   end;
+   vslim = vsmin+cumsum((vsmax-vsmin)/NVS*ones(1,NVS));
+   for iz=1:size(rep,2)
+      Nd(:,iz) = histc(rep(:,iz),vslim);
+   end;
+   %
+   % Normalize Histograms
+   %
+   if(inorm2 == 1)
+      for iz=1:size(rep,2)
+         Nd(:,iz) = Nd(:,iz)/max(Nd(:,iz));
+      end;
+   elseif(inorm2 == 2)
+      Nd = Nd/max(max(Nd));
+   end;
+   Nd = [zeros(length(vslim),1) Nd zeros(length(vslim),1)];
+   pcolor(fobsplt,vslim,Nd);shading flat;
+%   repmean = mean(rep,1);
+   set(gca,'FontSize',12);
+   set(gca,'LineWidth',1);
+%   plot(fobs,repmean,'-r');
+   plot(fobs,dobs,'o','MarkerEdgeColor','w',...
+                'MarkerFaceColor','k',...
+                'MarkerSize',4,'Linewidth',1);
+%   plot(fobs,dobs,'xw','MarkerSize',12);
+%   plot(fobs,dobs,'xk');
+%   plot(fobs,dobs,'-k','Linewidth',2);
+%   plot(fobs,dobs,'--w','Linewidth',2);
+   for j=1:length(fobs);
+      y = rep(:,j);
+      [nf(j,:)] = hpd(y,100,98);
+   end;
+%   plot(fobs,nf(:,1),'--k');
+%   plot(fobs,nf(:,2),'--k');
+   ylim  = [vsmin+50,vsmax-50];
+   ytick = [0,100,200,300,400];
+   set(gca,'YLim',ylim,'XLim',[fobs(1)-.05 fobs(end)+.05]);
+   set(gca,'YTickLabel',ytick,'YTick',ytick);
+   ylabel('Group Speed (m/s)');
+   if(hmax > 100.);
+      set(gca,'XTickLabel',[1 2 3 4 5],'XTick',[1 2 3 4 5]);
+   else
+      set(gca,'XTickLabel',[3 4 5 6 7 8 9],'XTick',[3 4 5 6 7 8 9]);
+   end;
+   xlabel('Frequency (Hz)');
+   set(gca,'TickDir','out');
+   box on;
+   clear nf;
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT Axx
+   %%
+   figw = 6;
+   figh = 3.5;
+   fig8=figure('visible','on');hold on;box on;
+   set(fig8,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   set(gca,'FontSize',12,'layer','top');
+   NAX = 800;
+   axmin = -.5;
+   axmax = 1.2;
+   axlim = axmin+cumsum((axmax-axmin)/NAX*ones(1,NAX));
+   daxxlags = diff(axxlags(1,:));
+   axxlagsplt = [axxlags(1,1)-daxxlags(1), axxlags(1,:), axxlags(1,end)+daxxlags(end)]-([daxxlags(1),daxxlags(1),daxxlags,daxxlags(end)]./2.);
+   for iz=1:size(axx,2)
+      Naxx(:,iz) = histc(axx(:,iz),axlim);
+   end;
+   %
+   % Normalize Histograms
+   %
+   if(inorm2 == 1)
+      for iz=1:size(Naxx,2)
+         Naxx(:,iz) = Naxx(:,iz)/max(Naxx(:,iz));
+      end;
+   elseif(inorm2 == 2)
+      Naxx = Naxx/max(max(Naxx));
+   end;
+   Naxx = [zeros(length(axlim),1) Naxx zeros(length(axlim),1)];
+   pcolor(axxlagsplt',axlim,Naxx);shading flat;
+
+   axxmean = mean(axx,1);
+   plot([axxlags(1,1) axxlags(1,end)],[0 0],'-k','Linewidth',2);
+   plot([axxlags(1,1) axxlags(1,end)],[0 0],'--w','Linewidth',2);
+   plot(axxlags(1,:),axxmean,'-k','Linewidth',2);
+   plot(axxlags(1,:),axxmean,'--w','Linewidth',2);
+%   for j=1:length(axxmean);
+%      y = axx(:,j);
+%      [nf(j,:)] = hpd(y,100,98);
+%      clear y;
+%   end;
+%   plot(axxlags(1,:),nf(:,1),'--k');
+%   plot(axxlags(1,:),nf(:,2),'--k');
+   set(gca,'XLim',[axxlags(1,1) axxlags(1,end)],'YLim',[axmin+.1 axmax-.1]);
+   set(gca,'YTickLabel',[-0.4 0 0.4 0.8],'YTick',[-0.4 0 0.4 0.8]);
+   ylabel('Autocorrelation');
+   set(gca,'XTickLabel',[-20 0 20],'XTick',[-20 0 20]);
+   xlabel('Lag');
+   set(gca,'TickDir','out');
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT resisdual densities
+   %%
+   figw = 6;
+   figh = 3.5;
+   fig9=figure('visible','on');hold on;box on;
+   set(fig9,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   set(gca,'FontSize',12,'layer','top');
+   NRE = 800;
+   resmin = -16;
+   resmax = 16;
+   reslim = resmin+cumsum((resmax-resmin)/NRE*ones(1,NRE));
+   for iz=1:size(res,2)
+      Nres(:,iz) = histc(res(:,iz),reslim);
+   end;
+   %
+   % Normalize Histograms
+   %
+   if(inorm2 == 1)
+      for iz=1:size(res,2)
+         Nres(:,iz) = Nres(:,iz)/max(Nres(:,iz));
+      end;
+   elseif(inorm2 == 2)
+      Nres = Nres/max(max(Nres));
+   end;
+   Nres = [zeros(length(reslim),1) Nres zeros(length(reslim),1)];
+   pcolor(fobsplt,reslim,Nres);shading flat;
+   plot([fobs(1) fobs(end)],[0 0],'-k','Linewidth',2);
+   plot([fobs(1) fobs(end)],[0 0],'--w','Linewidth',2);
+   ylim  = [resmin+1,resmax-1];
+   ytick = [-10,-5,0,5,10];
+   set(gca,'YLim',ylim,'Xlim',[fobs(1),fobs(end)]);
+   set(gca,'YTickLabel',ytick,'YTick',ytick);
+   ylabel('Residuals (m/s)');
+   if(hmax > 100.);
+      set(gca,'XTickLabel',[1 2 3 4 5],'XTick',[1 2 3 4 5]);
+   else;
+      set(gca,'XTickLabel',[3 4 5 6 7 8 9],'XTick',[3 4 5 6 7 8 9]);
+   end;
+   set(gca,'TickDir','out');
+   xlabel('Frequency (Hz)');
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT resisdual densities
+   %%
+   figw = 6;
+   figh = 3.5;
+   fig10=figure('visible','on');hold on;box on;
+   set(fig10,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   set(gca,'FontSize',12,'layer','top');
+   NRE = 800;
+   resarmin = -20;
+   resarmax = 20;
+   resarlim = resarmin+cumsum((resarmax-resarmin)/NRE*ones(1,NRE));
+   for iz=1:size(resar,2)
+      Nresar(:,iz) = histc(resar(:,iz),resarlim);
+   end;
+   %
+   % Normalize Histograms
+   %
+   if(inorm2 == 1)
+      for iz=1:size(resar,2)
+         Nresar(:,iz) = Nresar(:,iz)/max(Nresar(:,iz));
+      end;
+   elseif(inorm2 == 2)
+      Nresar = Nresar/max(max(Nresar));
+   end;
+   Nresar = [zeros(length(resarlim),1) Nresar zeros(length(resarlim),1)];
+   pcolor(fobsplt,resarlim,Nresar);shading flat;
+   plot([fobs(1) fobs(end)],[0 0],'-k','Linewidth',2);
+   plot([fobs(1) fobs(end)],[0 0],'--w','Linewidth',2);
+   ylim  = [resarmin+1,resarmax-1];
+   ytick = [-10,-5,0,5,10];
+   set(gca,'YLim',ylim,'Xlim',[fobs(1),fobs(end)]);
+   set(gca,'YTickLabel',ytick,'YTick',ytick);
+   ylabel('Residuals (m/s)');
+%   set(gca,'XTickLabel',[1 2 3 4 5],'XTick',[1 2 3 4 5]);
+   set(gca,'XTickLabel',[3 4 5 6 7 8 9],'XTick',[3 4 5 6 7 8 9]);
+   set(gca,'TickDir','out');
+   xlabel('Frequency (Hz)');
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT resisdual densities ARI
+   %%
+   if(iari == 1);
+      figw = 6;
+      figh = 3.5;
+      fig11=figure('visible','on');hold on;box on;
+      set(fig11,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+      set(gca,'FontSize',12,'layer','top');
+      NRE = 800;
+      resarimin = -20;
+      resarimax = 20;
+      resarilim = resarimin+cumsum((resarimax-resarimin)/NRE*ones(1,NRE));
+      for iz=1:size(resari,2)
+         Nresari(:,iz) = histc(resari(:,iz),resarilim);
+      end;
+      %
+      % Normalize Histograms
+      %
+      if(inorm2 == 1)
+         for iz=1:size(resari,2)
+            Nresari(:,iz) = Nresari(:,iz)/max(Nresari(:,iz));
+         end;
+      elseif(inorm2 == 2)
+         Nresari = Nresari/max(max(Nresari));
+      end;
+      Nresari = [zeros(length(resarilim),1) Nresari zeros(length(resarilim),1)];
+      pcolor(fobsplt,resarilim,Nresari);shading flat;
+      plot([fobs(1) fobs(end)],[0 0],'-k','Linewidth',2);
+      plot([fobs(1) fobs(end)],[0 0],'--w','Linewidth',2);
+      ylim  = [resarimin+1,resarimax-1];
+      ytick = [-10,-5,0,5,10];
+      set(gca,'YLim',ylim,'Xlim',[fobs(1),fobs(end)]);
+      set(gca,'YTickLabel',ytick,'YTick',ytick);
+      ylabel('Residuals (m/s)');
+%      set(gca,'XTickLabel',[1 2 3 4 5],'XTick',[1 2 3 4 5]);
+      set(gca,'XTickLabel',[3 4 5 6 7 8 9],'XTick',[3 4 5 6 7 8 9]);
+      set(gca,'TickDir','out');
+      xlabel('Frequency (Hz)');
+   end;
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT residual histogram densities
+   %%
+%   figw = 6;
+%   figh = 6;
+%   fig12=figure();hold on;box on;
+%   set(fig12,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+%   set(gca,'FontSize',12,'layer','top');
+   x   = -16.375:.75:16.375;
+   xx  = -16.25:.01:16.25;
+   xxx = -10.:.2:10.;
+%
+%   clear n1 xout;
+%   for iz=1:size(res,1)
+%      [n1(iz,:),xout] = hist(res(iz,:)/sd(iz),x);
+%      narea = sum(n1(iz,:)) * (xout(2)-xout(1));
+%      n1(iz,:) = n1(iz,:)/narea;
+%      stairs(xout,n1(iz,:),'k');
+%   end
+%   NRE = 800;
+%   reshmin = 0;
+%   reshmax = 1;
+%   reshlim = reshmin+cumsum((reshmax-reshmin)/NRE*ones(1,NRE));
+%   for iz=1:size(n1,2)
+%      Nresh(:,iz) = histc(n1(:,iz),reshlim);
+%   end;
+%   %
+%   % Normalize Histograms
+%   %
+%   if(inorm2 == 1)
+%      for iz=1:size(res,2)
+%         Nresh(:,iz) = Nresh(:,iz)/max(Nresh(:,iz));
+%      end;
+%   elseif(inorm2 == 2)
+%      Nresh = Nresh/max(max(Nresh));
+%   end;
+%   Nres = [zeros(length(reslim),1) Nres zeros(length(reslim),1)];
+%   save bla Nresh xout reshlim xxx x xx n1 res sd;
+%   pcolor(xout,reshlim,Nresh);shading flat;
+
+
+   
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%
+   %% PLOT MEAN residual histogram
+   %%
+   figw = 4;
+   figh = 2.6;
+   fig13=figure('visible','on');hold on;box on;
+   set(fig13,'PaperUnits','inches','PaperPosition',[0 0 figw figh]);
+   set(gca,'FontSize',12,'layer','top');
+   clear n1 xout;
+   resmean = mean(res,1);
+   resmean = resmean - mean(resmean);
+   n1 = histc(resmean./mean(sd),x);
+%   narea = sum(n1) * (xx(2)-xx(1));
+   narea = sum(n1)% * (xx(2)-xx(1));
+   n1 = n1/narea;
+   stairs(x,n1,'k');
+   stairs(x,n1,'--w');
+   nd = 1/sqrt(2*pi)*exp(-(xx.^2)/2);
+   plot(xx,nd,'-k')
+   plot(xx,nd,'--w')
+
+   axis([-6 6 0 0.6]);
+   set(gca,'XTick',[-4 0 4],'FontSize',12);
+   set(gca,'XTickLabel',[],'FontSize',12);
+   set(gca,'YTickLabel',[0 0.2 0.4],'YTick',[0 0.2 0.4]);
+   set(gca,'XTickLabel',[-4 0 4],'XTick',[-4 0 4]);
+   xlabel('Res. (std.dev.)');
+   clear resmean;
+end;
+
+if(isave == 1)
+   print(fig1,'-painters','-r250',strcat(plotfile1,plotext2),'-dpng');
+   print(fig1,'-painters','-r250',strcat(plotfile1,plotext3),'-depsc');
+   if(icov == 3);
+      print(fig2,'-painters','-r250',strcat(plotfile2,plotext2),'-dpng');
+      print(fig2,'-painters','-r250',strcat(plotfile2,plotext3),'-depsc');
+   end;
+   print(fig4,'-painters','-r250',strcat(plotfile4,plotext2),'-dpng');
+   print(fig4,'-painters','-r250',strcat(plotfile4,plotext3),'-depsc');
+   print(fig5,'-painters','-r250',strcat(plotfile5,plotext2),'-dpng');
+   print(fig5,'-painters','-r250',strcat(plotfile5,plotext3),'-depsc');
+   print(fig6,'-painters','-r250',strcat(plotfile6,plotext2),'-dpng');
+   print(fig6,'-painters','-r250',strcat(plotfile6,plotext3),'-depsc');
+   if(idatfit == 1);
+%      print(fig7,'-painters','-r250',strcat(plotfile7,plotext2),'-dpng');
+      print(fig7,'-painters','-r250',strcat(plotfile7,plotext3),'-depsc');
+%      print(fig8,'-painters','-r250',strcat(plotfile8,plotext2),'-dpng');
+      print(fig8,'-painters','-r250',strcat(plotfile8,plotext3),'-depsc');
+%      print(fig9,'-painters','-r250',strcat(plotfile9,plotext2),'-dpng');
+      print(fig9,'-painters','-r250',strcat(plotfile9,plotext3),'-depsc');
+%      print(fig10,'-painters','-r250',strcat(plotfile9,plotext2),'-dpng');
+      print(fig10,'-painters','-r250',strcat(plotfile10,plotext3),'-depsc');
+%      print(fig11,'-painters','-r250',strcat(plotfile11,plotext2),'-dpng');
+      print(fig11,'-painters','-r250',strcat(plotfile11,plotext3),'-depsc');
+%      print(fig12,'-painters','-r250',strcat(plotfile12,plotext2),'-dpng');
+%      print(fig12,'-painters','-r250',strcat(plotfile12,plotext3),'-depsc');
+%      print(fig13,'-painters','-r250',strcat(plotfile13,plotext2),'-dpng');
+%      print(fig13,'-painters','-r250',strcat(plotfile13,plotext3),'-depsc');
+   end;
+end;
+
+return;

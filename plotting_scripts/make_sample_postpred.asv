@@ -1,0 +1,20 @@
+
+filebase = 'HON';
+irandom = false;
+step = 1;
+Ndat = 60000;
+
+
+%==============================================================================
+
+sample_postpred_file = strcat(filebase,'_sample_postpred.dat');
+
+load HON_voro_sample.mat
+
+if irandom
+    
+else
+    A1 = A(1:step:end,:);
+end 
+
+save(sample_postpred_file, 'A1', '-ascii')
