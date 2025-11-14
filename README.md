@@ -16,13 +16,13 @@ $ make
 If compiling and linking is done successfuly, a binary file called "prjmh_temper_rf" is created inside the bin derectorty.
 
 ### Run examples
-For example to do the MT-SWD-RF PMPI for example 1: \
+For example to run the MT-SWD-RF PMPI for example 1: \
 Go to the directory example1_partial_coupling \
-$ cd <path/to/RF-SWD-ELL-MT-PMPI/example1_partial_coupling> \
+$ cd <path/to/RF-SWD-ELL-MT-PMPI/example1_partial_coupling/> \
 $ cd MT_SWD_RF \
 $ mpirun -np 12 <path/to/RF-SWD-ELL-MT-PMPI/src/bin/prjmh_temper_r> \
 Here 12 is the number of parallel MPI processes. All the results in the paper were produced by using 12 MPI processes. \
 To terminate reversible-jump Markov chain Monte Carlo sampling, press CTRL + C. \
-To plot the results, put <path/to/plotting scripts/> inside your MATLAB path \
-Then in the MATLAB command window run the following script \
+To plot the results, put <path/to/RF-SWD-ELL-MT-PMPI/plotting_scripts/> inside your MATLAB path \
+Then inside the MATLAB command window run the following script \
 rf_plot_rjhist_varpar2.m
